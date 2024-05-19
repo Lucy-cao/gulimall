@@ -15,3 +15,8 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+**/target
+.idea
+# 子模块中的忽略文件可以不需要了
+**/.gitignore
