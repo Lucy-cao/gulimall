@@ -7,8 +7,8 @@ server:
       min-spare: 30
     connection-timeout: 5000ms
   port: 8080
-  servlet:
-    context-path: /gulimall-admin
+#  servlet:
+#    context-path: /gulimall-admin
 
 spring:
   # 环境 dev|test|prod
@@ -28,6 +28,15 @@ spring:
     throw-exception-if-no-handler-found: true
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  application:
+    name: gulimall-admin
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+      config:
+        import-check:
+          enabled: false
 #  resources:
 #    add-mappings: false
 

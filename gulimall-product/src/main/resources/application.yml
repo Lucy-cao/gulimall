@@ -2,12 +2,15 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: root
-    url: jdbc:mysql://192.168.1.106:3306/gulimall-pms
+    password: abc,,,123
+    url: jdbc:mysql://localhost:3306/gulimall_pms
   cloud:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+      config:
+        import-check:
+          enabled: false
   application:
     name: "gulimall-product"
 mybatis-plus:
