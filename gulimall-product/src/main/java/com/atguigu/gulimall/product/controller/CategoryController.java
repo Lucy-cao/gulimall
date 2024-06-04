@@ -38,7 +38,7 @@ public class CategoryController {
         //返回树形结构的商品列表
         List<CategoryEntity> entities = categoryService.listWithTree();
 
-        return R.ok().put("category", entities);
+        return R.ok().put("data", entities);
     }
 
 
@@ -50,7 +50,7 @@ public class CategoryController {
     public R info(@PathVariable("catId") Long catId) {
         CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**
@@ -76,12 +76,14 @@ public class CategoryController {
     }
 
     /**
-     * 删除
+     * 删除,@RequestBody是请求体，只有POST请求才有
      */
     @RequestMapping("/delete")
     //@RequiresPermissions("product:category:delete")
     public R delete(@RequestBody Long[] catIds) {
-        categoryService.removeByIds(Arrays.asList(catIds));
+//        categoryService.removeByIds(Arrays.asList(catIds));
+
+        categoryService.removeMenusById(Arrays.asList(catIds));
 
         return R.ok();
     }

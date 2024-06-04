@@ -10,17 +10,21 @@ spring:
         namespace: d446200d-7d39-4774-9549-1aa7a17931c4
     gateway:
       routes:
-        # 跳转到gulimall-admin相关的接口服务中
+        - id: product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*),/$\{segment}
+
+        # 跳转到renren-fast相关的接口服务中
         - id: admin_route
           uri: lb://renren-fast
           predicates:
             - Path=/api/**
           filters:
             - RewritePath=/api/?(?<segment>.*),/renren-fast/$\{segment}
-        - id: product_route
-          uri: lb://gulimall-product
-          predicates:
-            - Path=/product/**
+
         - id: query_baidu
           uri: https://www.baidu.com
           predicates:
