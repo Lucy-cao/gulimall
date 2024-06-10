@@ -76,6 +76,15 @@ public class CategoryController {
     }
 
     /**
+     * 批量更新商品种类
+     */
+    @RequestMapping("/batchUpdate")
+    public R batchUpdate(@RequestBody List<CategoryEntity> categories){
+        categoryService.updateBatchById(categories);
+        return R.ok();
+    }
+
+    /**
      * 删除,@RequestBody是请求体，只有POST请求才有
      */
     @RequestMapping("/delete")
