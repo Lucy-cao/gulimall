@@ -19,7 +19,7 @@ class GulimallThirdPartyApplicationTests {
         // 填写Bucket名称，例如examplebucket。
         String bucketName = "lucy-typora";
         // 填写Object完整路径，例如exampledir/exampleobject.txt。Object完整路径中不能包含Bucket名称。
-        String objectName = "img/笔记本选择参考4.jpg";
+        String objectName = "img/笔记本选择参考5.jpg";
 
         try {
             //上传文件流

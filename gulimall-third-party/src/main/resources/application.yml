@@ -7,11 +7,7 @@ spring:
         server-addr: 127.0.0.1:8848
       config:
         server-addr: 127.0.0.1:8848
-        import-check:
-          enabled: false
-alibaba:
-  cloud:
-    access-key: LTAI5tN9nbmc4V7GAMxQVRyZ
-    secret-key: 4YWY1vSjDwqe8ZTOqD1LpEQHzkZlER
-    oss:
-      endpoint: oss-cn-hangzhou.aliyuncs.com
+        namespace: 48eedc31-4be1-4d47-90ce-206e12183e9c
+  config:
+    import:
+      - nacos:oss.yml?refreshEnabled=true&group=dev
