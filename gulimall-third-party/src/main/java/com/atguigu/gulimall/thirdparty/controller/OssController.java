@@ -56,7 +56,7 @@ public class OssController {
             respMap.put("expire", String.valueOf(expireEndTime / 1000));
             // respMap.put("expire", formatISO8601Date(expiration));
 
-            return R.ok().put("policy", respMap);
+            return R.ok().put("data", respMap);
         } catch (Exception e) {
             // Assert.fail(e.getMessage());
             System.out.println(e.getMessage());
