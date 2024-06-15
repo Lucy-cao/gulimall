@@ -11,3 +11,5 @@ spring:
   config:
     import:
       - nacos:oss.yml?refreshEnabled=true&group=dev
+server:
+  port: 30000
