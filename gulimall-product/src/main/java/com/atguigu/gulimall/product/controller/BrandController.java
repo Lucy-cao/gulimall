@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.atguigu.common.validator.group.AddGroup;
+import com.atguigu.common.validator.group.UpdateGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -62,7 +64,8 @@ public class BrandController {
      */
     @RequestMapping("/save")
     //@RequiresPermissions("product:brand:save")
-    public R save(@Valid @RequestBody BrandEntity brand) {
+    //只校验新增分组的注解
+    public R save(@Validated(AddGroup.class) @RequestBody BrandEntity brand) {
         brandService.save(brand);
         return R.ok();
     }
@@ -72,7 +75,8 @@ public class BrandController {
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:brand:update")
-    public R update(@RequestBody BrandEntity brand) {
+    //只校验修改分组的注解
+    public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();
