@@ -6,8 +6,8 @@ import java.util.Map;
 
 import com.atguigu.common.validator.group.AddGroup;
 import com.atguigu.common.validator.group.UpdateGroup;
+import com.atguigu.common.validator.group.UpdateStatusGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,6 +77,18 @@ public class BrandController {
     //@RequiresPermissions("product:brand:update")
     //只校验修改分组的注解
     public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
+        brandService.updateById(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改显示状态
+     */
+    @RequestMapping("/update/status")
+    //@RequiresPermissions("product:brand:update")
+    //只校验修改状态分组的注解
+    public R updateStatus(@Validated(UpdateStatusGroup.class) @RequestBody BrandEntity brand) {
         brandService.updateById(brand);
 
         return R.ok();

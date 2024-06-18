@@ -30,6 +30,7 @@ public class ExceptionControllerAdvice {
     // 处理通用异常
     @ExceptionHandler(value = Throwable.class)
     public R handleException(Throwable throwable) {
+        log.error("通用，错误信息：{}，异常类型：{}", throwable.getMessage(), throwable.getClass());
         return R.error(BizCodeEnum.UNKNOW_EXCEPTION.getCode(), BizCodeEnum.UNKNOW_EXCEPTION.getMsg());
     }
 }
