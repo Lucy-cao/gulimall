@@ -31,12 +31,12 @@ public class AttrGroupController {
     private AttrGroupService attrGroupService;
 
     /**
-     * 列表
+     * 根据分类id获取属性分组的列表信息
      */
-    @RequestMapping("/list")
-    //@RequiresPermissions("product:attrgroup:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrGroupService.queryPage(params);
+    @RequestMapping("/list/{catelogId}")
+    public R listByCatId(@RequestParam Map<String, Object> params,
+                         @PathVariable("catelogId") Long catelogId){
+        PageUtils page = attrGroupService.queryByCatId(params, catelogId);
 
         return R.ok().put("page", page);
     }
@@ -48,7 +48,7 @@ public class AttrGroupController {
     @RequestMapping("/info/{attrGroupId}")
     //@RequiresPermissions("product:attrgroup:info")
     public R info(@PathVariable("attrGroupId") Long attrGroupId){
-		AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
+		AttrGroupEntity attrGroup = attrGroupService.getCascaderById(attrGroupId);
 
         return R.ok().put("attrGroup", attrGroup);
     }

@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.service.impl;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +55,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void removeMenusById(List<Long> asList) {
         //TODO: 删除前需要校验菜单是否被引用
         baseMapper.deleteBatchIds(asList);
+    }
+
+    @Override
+    public List<Long> getCascaderById(Long catId) {
+        //获取级联分类
+        List<Long> catelogIds = new ArrayList<>();
+        Long currentCatlogId = catId;
+        while(!currentCatlogId.equals(0L)){
+            //将当前id放进去
+            catelogIds.add(0, currentCatlogId);
+            CategoryEntity category = this.getById(currentCatlogId);
+            //将父级id赋值给当前id
+            currentCatlogId = category.getParentCid();
+        }
+        return catelogIds;
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity root, List<CategoryEntity> all) {
