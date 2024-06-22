@@ -1,10 +1,15 @@
 package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.gulimall.product.constant.AttrTypeEnum;
+import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.vo.AttrVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,6 +28,8 @@ import org.w3c.dom.Attr;
 
 @Service("attrService")
 public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements AttrService {
+    @Autowired
+    AttrAttrgroupRelationDao attrAttrgroupRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -58,6 +65,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
         return new PageUtils(page);
+    }
+
+    @Override
+    public void saveDetail(AttrVo attrVo) {
+        //保存属性
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attrVo, attrEntity);
+        this.save(attrEntity);
+        //保存关联数据
+        AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
+        relation.setAttrId(attrEntity.getAttrId());
+        relation.setAttrGroupId(attrVo.getAttrGroupId());
+        attrAttrgroupRelationDao.insert(relation);
     }
 
 }
