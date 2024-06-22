@@ -77,7 +77,7 @@ public class BrandController {
     //@RequiresPermissions("product:brand:update")
     //只校验修改分组的注解
     public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
-        brandService.updateById(brand);
+        brandService.updateDetail(brand);
 
         return R.ok();
     }

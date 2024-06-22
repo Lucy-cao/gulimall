@@ -50,7 +50,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         String key = (String) params.get("key");
         if (!StringUtils.isEmpty(key)) {
             wrapper.and(obj -> {
-                obj.eq("attr_group_id", key).or().like("attr_group_name", key);
+                obj.like("attr_group_name", key).or().like("descript", key);
             });
         }
 
@@ -64,7 +64,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         //获取基本信息
         AttrGroupEntity attrGroup = this.getById(attrGroupId);
         //获取分类的级联完整id，并赋值返回
-        attrGroup.setCatelogIds(categoryService.getCascaderById(attrGroup.getCatelogId()));
+        attrGroup.setCatelogPath(categoryService.getCascaderById(attrGroup.getCatelogId()));
         return attrGroup;
     }
 }

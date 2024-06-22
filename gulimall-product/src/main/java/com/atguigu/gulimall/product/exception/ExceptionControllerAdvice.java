@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.exception;
 
 import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.common.exception.RRException;
 import com.atguigu.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,6 +26,11 @@ public class ExceptionControllerAdvice {
         });
 
         return R.error(BizCodeEnum.VALID_EXCEPTION.getCode(), BizCodeEnum.VALID_EXCEPTION.getMsg()).put("data", errorMap);
+    }
+
+    @ExceptionHandler(value = RRException.class)
+    public R handle(RRException e) {
+        return R.error(e.getCode(), e.getMessage());
     }
 
     // 处理通用异常

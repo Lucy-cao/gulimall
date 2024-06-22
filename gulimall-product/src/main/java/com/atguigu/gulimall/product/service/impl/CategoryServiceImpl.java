@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,10 +19,13 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    @Autowired
+    CategoryBrandRelationDao categoryBrandRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -46,7 +51,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     return root;
                 })
                 //进行排序
-                .sorted((menu1, menu2) -> (menu1.getSort()==null?0:menu1.getSort()) - (menu2.getSort()==null?0:menu2.getSort()))
+                .sorted((menu1, menu2) -> (menu1.getSort() == null ? 0 : menu1.getSort()) - (menu2.getSort() == null ? 0 : menu2.getSort()))
                 .collect(Collectors.toList());
         return rootMenu;
     }
@@ -62,7 +67,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         //获取级联分类
         List<Long> catelogIds = new ArrayList<>();
         Long currentCatlogId = catId;
-        while(!currentCatlogId.equals(0L)){
+        while (!currentCatlogId.equals(0L)) {
             //将当前id放进去
             catelogIds.add(0, currentCatlogId);
             CategoryEntity category = this.getById(currentCatlogId);
@@ -72,6 +77,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return catelogIds;
     }
 
+    @Override
+    @Transactional
+    public void updateDetail(CategoryEntity category) {
+        //更新详情，同时更新关联的冗余表
+        this.updateById(category);
+        categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
+    }
+
     private List<CategoryEntity> getChildren(CategoryEntity root, List<CategoryEntity> all) {
         //获取当前菜单的子菜单
         List<CategoryEntity> childrenMenus = all.stream().filter(item -> Objects.equals(item.getParentCid(), root.getCatId()))
@@ -79,7 +92,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     //子菜单递归获取各自的子菜单
                     menu.setChildren(getChildren(menu, all));
                     return menu;
-                }).sorted((menu1, menu2) ->  (menu1.getSort()==null?0:menu1.getSort()) - (menu2.getSort()==null?0:menu2.getSort()))
+                }).sorted((menu1, menu2) -> (menu1.getSort() == null ? 0 : menu1.getSort()) - (menu2.getSort() == null ? 0 : menu2.getSort()))
                 .collect(Collectors.toList());
 
         return childrenMenus;
