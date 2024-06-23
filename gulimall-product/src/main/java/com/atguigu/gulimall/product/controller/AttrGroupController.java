@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class AttrGroupController {
     private AttrGroupService attrGroupService;
     @Autowired
     private AttrService attrService;
+    @Autowired
+    AttrAttrgroupRelationService relationService;
 
     /**
      * 根据分类id获取属性分组的列表信息
@@ -81,6 +85,15 @@ public class AttrGroupController {
     public R save(@RequestBody AttrGroupEntity attrGroup) {
         attrGroupService.save(attrGroup);
 
+        return R.ok();
+    }
+
+    /**
+     * 添加属性与分组的关联关系
+     */
+    @PostMapping("/attr/relation")
+    public R saveRelations(@RequestBody List<AttrAttrgroupRelationEntity> relations) {
+        relationService.saveBatch(relations);
         return R.ok();
     }
 
