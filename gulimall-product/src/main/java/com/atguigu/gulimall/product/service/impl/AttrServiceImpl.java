@@ -8,12 +8,14 @@ import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
+import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -107,6 +109,66 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         relation.setAttrId(attrEntity.getAttrId());
         relation.setAttrGroupId(attrVo.getAttrGroupId());
         attrAttrgroupRelationDao.insert(relation);
+    }
+
+    /**
+     * 根据属性id获取详情信息
+     *
+     * @param attrId 属性id
+     * @return
+     */
+    @Override
+    public AttrRespVo getDetailById(Long attrId) {
+        AttrRespVo respVo = new AttrRespVo();
+        //获取实体基本信息
+        AttrEntity attrEntity = this.getById(attrId);
+        BeanUtils.copyProperties(attrEntity, respVo);
+        //获取完整的分类路径id
+        CategoryCascaderVo cascaderById = categoryService.getCascaderById(attrEntity.getCatelogId());
+        respVo.setCatelogPath(cascaderById.getCascaderId());
+        //获取关联的分组id
+        AttrAttrgroupRelationEntity relation = attrAttrgroupRelationDao.selectOne(
+                Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                        .eq(AttrAttrgroupRelationEntity::getAttrId, attrId));
+        if (relation != null) {
+            respVo.setAttrGroupId(relation.getAttrGroupId());
+        }
+        return respVo;
+    }
+
+    /**
+     * 修改属性，和关联的属性分组
+     * @param attrVo 
+     */
+    @Override
+    public void updateDetailById(AttrVo attrVo) {
+        //修改属性的基本信息
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attrVo, attrEntity);
+        this.updateById(attrEntity);
+        //修改关联的属性分组信息
+        //判断是否有关联数据
+        AttrAttrgroupRelationEntity relation = attrAttrgroupRelationDao.selectOne(Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                .eq(AttrAttrgroupRelationEntity::getAttrId, attrVo.getAttrId()));
+        if (relation != null) {//有关联数据
+            if (attrVo.getAttrGroupId() != null) {
+                //有分组id，需要更新
+                relation.setAttrGroupId(attrVo.getAttrGroupId());
+                attrAttrgroupRelationDao.updateById(relation);
+            } else {
+                //没有分组id，需要删除
+                attrAttrgroupRelationDao.deleteById(relation);
+            }
+        } else {//没有关联数据
+            if (attrVo.getAttrGroupId() != null){
+                //有分组id，需要新增
+                relation = new AttrAttrgroupRelationEntity();
+                relation.setAttrId(attrVo.getAttrId());
+                relation.setAttrGroupId(attrVo.getAttrGroupId());
+                attrAttrgroupRelationDao.insert(relation);
+            }
+            //没有分组id，无需操作
+        }
     }
 
 }
