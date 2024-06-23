@@ -6,6 +6,7 @@ import com.atguigu.gulimall.product.dao.AttrGroupDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
@@ -105,10 +106,12 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         BeanUtils.copyProperties(attrVo, attrEntity);
         this.save(attrEntity);
         //保存关联数据
-        AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
-        relation.setAttrId(attrEntity.getAttrId());
-        relation.setAttrGroupId(attrVo.getAttrGroupId());
-        attrAttrgroupRelationDao.insert(relation);
+        if (attrVo.getAttrGroupId() != null) {
+            AttrAttrgroupRelationEntity relation = new AttrAttrgroupRelationEntity();
+            relation.setAttrId(attrEntity.getAttrId());
+            relation.setAttrGroupId(attrVo.getAttrGroupId());
+            attrAttrgroupRelationDao.insert(relation);
+        }
     }
 
     /**
@@ -138,7 +141,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
     /**
      * 修改属性，和关联的属性分组
-     * @param attrVo 
+     *
+     * @param attrVo
      */
     @Override
     public void updateDetailById(AttrVo attrVo) {
@@ -160,7 +164,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                 attrAttrgroupRelationDao.deleteById(relation);
             }
         } else {//没有关联数据
-            if (attrVo.getAttrGroupId() != null){
+            if (attrVo.getAttrGroupId() != null) {
                 //有分组id，需要新增
                 relation = new AttrAttrgroupRelationEntity();
                 relation.setAttrId(attrVo.getAttrId());
@@ -169,6 +173,38 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             }
             //没有分组id，无需操作
         }
+    }
+
+    /**
+     * 获取属性分组关联的属性
+     *
+     * @param attrGroupId
+     * @return
+     */
+    @Override
+    public List<AttrEntity> getRelatedAttr(Long attrGroupId) {
+        //获取属性分组关联的属性id
+        List<AttrAttrgroupRelationEntity> relations = attrAttrgroupRelationDao.selectList(
+                Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                        .eq(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupId));
+        if (relations == null | relations.size() == 0) {
+            return null;
+        }
+        List<Long> collect = relations.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+
+        //根据属性id获取属性对象
+        List<AttrEntity> attrEntities = this.listByIds(collect);
+        return attrEntities;
+    }
+
+    /**
+     * 批量删除属性和属性分组的关系
+     *
+     * @param relationVos 待删除的属性和属性分组id列表
+     */
+    @Override
+    public void deleteRelation(List<AttrGroupRelationVo> relationVos) {
+        attrAttrgroupRelationDao.deleteRelations(relationVos);
     }
 
 }
