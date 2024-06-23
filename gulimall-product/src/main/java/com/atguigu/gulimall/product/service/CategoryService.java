@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.service;
 
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
@@ -23,7 +24,7 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     void removeMenusById(List<Long> asList);
 
-    List<Long> getCascaderById(Long catId);
+    CategoryCascaderVo getCascaderById(Long catId);
 
     void updateDetail(CategoryEntity category);
 }

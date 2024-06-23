@@ -2,17 +2,22 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.gulimall.product.constant.AttrTypeEnum;
 import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
+import com.atguigu.gulimall.product.dao.AttrGroupDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -30,6 +35,10 @@ import org.w3c.dom.Attr;
 public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements AttrService {
     @Autowired
     AttrAttrgroupRelationDao attrAttrgroupRelationDao;
+    @Autowired
+    AttrGroupDao attrGroupDao;
+    @Autowired
+    CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -64,7 +73,27 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             wrapper.like(AttrEntity::getAttrName, key);
         }
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
-        return new PageUtils(page);
+        PageUtils pageUtils = new PageUtils(page);
+        //获取分类和分组信息
+        List<AttrEntity> attrEntities = page.getRecords();
+        List<AttrRespVo> respVos = attrEntities.stream().map(attr -> {
+            AttrRespVo respVo = new AttrRespVo();
+            BeanUtils.copyProperties(attr, respVo);
+            //获取分组信息
+            AttrAttrgroupRelationEntity relation = attrAttrgroupRelationDao.selectOne(
+                    Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                            .eq(AttrAttrgroupRelationEntity::getAttrId, attr.getAttrId()));
+            if (relation != null) {
+                AttrGroupEntity groupEntity = attrGroupDao.selectById(relation.getAttrGroupId());
+                respVo.setGroupName(groupEntity.getAttrGroupName());
+            }
+
+            //获取分类信息
+            respVo.setCatelogName(categoryService.getCascaderById(attr.getCatelogId()).getCascaderNames());
+            return respVo;
+        }).collect(Collectors.toList());
+        pageUtils.setList(respVos);
+        return pageUtils;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
+import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,18 +65,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     @Override
-    public List<Long> getCascaderById(Long catId) {
+    public CategoryCascaderVo getCascaderById(Long catId) {
         //获取级联分类
         List<Long> catelogIds = new ArrayList<>();
+        List<String> catelogNames = new ArrayList<>();
         Long currentCatlogId = catId;
         while (!currentCatlogId.equals(0L)) {
             //将当前id放进去
             catelogIds.add(0, currentCatlogId);
             CategoryEntity category = this.getById(currentCatlogId);
+            catelogNames.add(0, category.getName());
             //将父级id赋值给当前id
             currentCatlogId = category.getParentCid();
         }
-        return catelogIds;
+        //返回数据
+        CategoryCascaderVo cascaderVo = new CategoryCascaderVo();
+        cascaderVo.setCascaderId(catelogIds);
+        cascaderVo.setCascaderNames(String.join("/", catelogNames));
+        return cascaderVo;
     }
 
     @Override

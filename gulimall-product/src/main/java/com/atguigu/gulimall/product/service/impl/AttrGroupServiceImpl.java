@@ -2,8 +2,10 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrGroupRespVo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -53,10 +56,18 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 obj.like("attr_group_name", key).or().like("descript", key);
             });
         }
-
         //获取实际的返回值
         IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), wrapper);
-        return new PageUtils(page);
+        PageUtils pageUtils = new PageUtils(page);
+        //拼接所属分类完整信息
+        List<AttrGroupRespVo> respVos = page.getRecords().stream().map(attrGroupEntity -> {
+            AttrGroupRespVo respVo = new AttrGroupRespVo();
+            BeanUtils.copyProperties(attrGroupEntity, respVo);
+            respVo.setCatelogNames(categoryService.getCascaderById(attrGroupEntity.getCatelogId()).getCascaderNames());
+            return respVo;
+        }).collect(Collectors.toList());
+        pageUtils.setList(respVos);
+        return pageUtils;
     }
 
     @Override
@@ -64,7 +75,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         //获取基本信息
         AttrGroupEntity attrGroup = this.getById(attrGroupId);
         //获取分类的级联完整id，并赋值返回
-        attrGroup.setCatelogPath(categoryService.getCascaderById(attrGroup.getCatelogId()));
+        attrGroup.setCatelogPath(categoryService.getCascaderById(attrGroup.getCatelogId()).getCascaderId());
         return attrGroup;
     }
 }
