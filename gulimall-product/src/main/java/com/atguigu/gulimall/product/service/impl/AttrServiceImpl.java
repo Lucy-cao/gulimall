@@ -187,7 +187,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         List<AttrAttrgroupRelationEntity> relations = attrAttrgroupRelationDao.selectList(
                 Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
                         .eq(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupId));
-        if (relations == null | relations.size() == 0) {
+        if (relations == null || relations.size() == 0) {
             return null;
         }
         List<Long> collect = relations.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
@@ -205,6 +205,44 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     @Override
     public void deleteRelation(List<AttrGroupRelationVo> relationVos) {
         attrAttrgroupRelationDao.deleteRelations(relationVos);
+    }
+
+    /**
+     * 获取当前属性分组未关联的属性
+     *
+     * @param params
+     * @param attrGroupId
+     * @return
+     */
+    @Override
+    public PageUtils getNoRelatedAttr(Map<String, Object> params, Long attrGroupId) {
+        //1、获取当前属性分组所在的分类
+        AttrGroupEntity groupEntity = attrGroupDao.selectById(attrGroupId);
+        Long catlogId = groupEntity.getCatelogId();
+        //2、获取当前分类下所有的属性分组
+        List<AttrGroupEntity> attrGroupEntities = attrGroupDao.selectList(Wrappers.lambdaQuery(AttrGroupEntity.class)
+                .eq(AttrGroupEntity::getCatelogId, catlogId));
+        List<Long> attrGroupIds = attrGroupEntities.stream().map(AttrGroupEntity::getAttrGroupId).collect(Collectors.toList());
+        //3、获取所有属性分组已关联的属性
+        List<AttrAttrgroupRelationEntity> relations = attrAttrgroupRelationDao.selectList(Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                .in(AttrAttrgroupRelationEntity::getAttrGroupId, attrGroupIds));
+        List<Long> relatedAttrIds = new ArrayList<>();
+        if (relations != null) {
+            relatedAttrIds = relations.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+        }
+        //4、获取当前分类下，不在已关联范围的其他属性
+        LambdaQueryWrapper<AttrEntity> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(AttrEntity::getCatelogId, catlogId).eq(AttrEntity::getAttrType, AttrTypeEnum.BASE_ATTR.getCode());
+        if (relatedAttrIds.size() > 0) {
+            wrapper.notIn(AttrEntity::getAttrId, relatedAttrIds);
+        }
+        //根据关键词查询
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            wrapper.like(AttrEntity::getAttrName, key);
+        }
+        IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
+        return new PageUtils(page);
     }
 
 }

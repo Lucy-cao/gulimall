@@ -65,6 +65,15 @@ public class AttrGroupController {
     }
 
     /**
+     * 获取当前分类中，未与当前属性分组关联的属性
+     */
+    @GetMapping("/{attrGroupId}/noattr/relation")
+    public R getNoRelatedAttr(@RequestParam Map<String, Object> params, @PathVariable Long attrGroupId) {
+        PageUtils page = attrService.getNoRelatedAttr(params, attrGroupId);
+        return R.ok().put("page", page);
+    }
+
+    /**
      * 保存
      */
     @RequestMapping("/save")
@@ -101,7 +110,7 @@ public class AttrGroupController {
      * 删除属性分组和属性的关联关系
      */
     @PostMapping("/attr/relation/delete")
-    public R deleteRelation(@RequestBody List<AttrGroupRelationVo> relationVos){
+    public R deleteRelation(@RequestBody List<AttrGroupRelationVo> relationVos) {
         attrService.deleteRelation(relationVos);
 
         return R.ok();
