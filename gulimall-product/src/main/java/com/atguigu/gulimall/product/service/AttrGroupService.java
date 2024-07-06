@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,5 +22,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     PageUtils queryByCatId(Map<String, Object> params, Long catelogId);
     //根据id获取信息，返回所属分类的级联id
     AttrGroupEntity getCascaderById(Long attrGroupId);
+
+    List<AttrGroupRespVo> getAttrGroupWithAttrByCatlogId(Long catelogId);
 }
 

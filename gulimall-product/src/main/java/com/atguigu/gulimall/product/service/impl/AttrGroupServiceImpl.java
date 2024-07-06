@@ -1,6 +1,11 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.atguigu.gulimall.product.dao.AttrDao;
+import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
+import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
+import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
+import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrGroupRespVo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -30,6 +35,11 @@ import com.atguigu.gulimall.product.service.AttrGroupService;
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    AttrAttrgroupRelationService attrgroupRelationService;
+    @Autowired
+    AttrDao attrDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -77,5 +87,30 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         //获取分类的级联完整id，并赋值返回
         attrGroup.setCatelogPath(categoryService.getCascaderById(attrGroup.getCatelogId()).getCascaderId());
         return attrGroup;
+    }
+
+    @Override
+    public List<AttrGroupRespVo> getAttrGroupWithAttrByCatlogId(Long catelogId) {
+        //1、根据分类id获取属性分组
+        List<AttrGroupEntity> attrGroupEntityList = this.list(Wrappers.lambdaQuery(AttrGroupEntity.class)
+                .eq(AttrGroupEntity::getCatelogId, catelogId));
+
+        //2、根据分组信息获取里面的属性信息
+        List<AttrGroupRespVo> respVos = attrGroupEntityList.stream().map(item -> {
+            AttrGroupRespVo respVo = new AttrGroupRespVo();
+            BeanUtils.copyProperties(item, respVo);
+            //1、获取属性分组关联的属性
+            List<AttrAttrgroupRelationEntity> relation = attrgroupRelationService.list(
+                    Wrappers.lambdaQuery(AttrAttrgroupRelationEntity.class)
+                            .eq(AttrAttrgroupRelationEntity::getAttrGroupId, item.getAttrGroupId()));
+            //2、获取属性的详情
+            List<Long> attrIds = relation.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+            if (attrIds.size() > 0) {
+                respVo.setAttrs(attrDao.selectBatchIds(attrIds));
+            }
+            return respVo;
+        }).collect(Collectors.toList());
+
+        return respVos;
     }
 }

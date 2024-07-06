@@ -1,0 +1,445 @@
+{
+  "spuName": "华为畅享 70 Pro",
+  "spuDescription": "华为畅享 70 Pro",
+  "catalogId": 225,
+  "brandId": 9,
+  "weight": 0.199,
+  "publishStatus": 0,
+  "decript": [
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//24567520-6ca2-4e38-83a7-b5d6154f42a8_0d40c24b264aa511.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//f8a3d19e-a94a-48e9-8512-3a8f868f2852_1f15cdbcf9e1273c.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//2a0a7d40-a5ed-45ea-8395-85109ef6740d_f205d9c99a2b4b01.jpg"
+  ],
+  "images": [
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//970707d1-c207-455d-8bd5-daf649e53776_b9840ff8da7762ae.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//f84e5a98-d460-44c7-8dd6-16382d57525d_b5c6b23d01dcdf81.jpg",
+    "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//a46ecccf-bf9b-45ec-8540-8be6c2baf45d_28f296629cca865e.jpg"
+  ],
+  "bounds": {
+    "buyBounds": 400,
+    "growBounds": 50
+  },
+  "baseAttrs": [
+    {
+      "attrId": 7,
+      "attrValues": "CTR-AL20",
+      "showDesc": 1
+    },
+    {
+      "attrId": 8,
+      "attrValues": "2024-01-08",
+      "showDesc": 1
+    },
+    {
+      "attrId": 13,
+      "attrValues": "宽74.7mm；长163.3mm；厚8.4mm",
+      "showDesc": 0
+    },
+    {
+      "attrId": 14,
+      "attrValues": "以官网信息为准",
+      "showDesc": 0
+    },
+    {
+      "attrId": 15,
+      "attrValues": "骁龙",
+      "showDesc": 1
+    },
+    {
+      "attrId": 16,
+      "attrValues": "骁龙600系列",
+      "showDesc": 1
+    },
+    {
+      "attrId": 19,
+      "attrValues": "不支持",
+      "showDesc": 0
+    },
+    {
+      "attrId": 20,
+      "attrValues": "256GB",
+      "showDesc": 1
+    },
+    {
+      "attrId": 21,
+      "attrValues": "HarmonyOS",
+      "showDesc": 0
+    }
+  ],
+  "skus": [
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "翡冷翠"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "256GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 翡冷翠 256GB",
+      "price": "1599",
+      "skuTitle": "华为畅享 70 Pro 翡冷翠 256GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//f84e5a98-d460-44c7-8dd6-16382d57525d_b5c6b23d01dcdf81.jpg",
+          "defaultImg": 1
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        }
+      ],
+      "descar": [
+        "翡冷翠",
+        "256GB"
+      ],
+      "fullCount": 1000,
+      "discount": 0.99,
+      "countStatus": 1,
+      "fullPrice": 1500,
+      "reducePrice": 10,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 1569
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 1496
+        }
+      ]
+    },
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "翡冷翠"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "128GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 翡冷翠 128GB",
+      "price": "1399",
+      "skuTitle": "华为畅享 70 Pro 翡冷翠 128GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//f84e5a98-d460-44c7-8dd6-16382d57525d_b5c6b23d01dcdf81.jpg",
+          "defaultImg": 1
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        }
+      ],
+      "descar": [
+        "翡冷翠",
+        "128GB"
+      ],
+      "fullCount": 0,
+      "discount": 0,
+      "countStatus": 0,
+      "fullPrice": 0,
+      "reducePrice": 0,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 1569
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 1496
+        }
+      ]
+    },
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "曜金黑"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "256GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 曜金黑 256GB",
+      "price": "1599",
+      "skuTitle": "华为畅享 70 Pro 曜金黑 256GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//a46ecccf-bf9b-45ec-8540-8be6c2baf45d_28f296629cca865e.jpg",
+          "defaultImg": 1
+        }
+      ],
+      "descar": [
+        "曜金黑",
+        "256GB"
+      ],
+      "fullCount": 0,
+      "discount": 0,
+      "countStatus": 0,
+      "fullPrice": 0,
+      "reducePrice": 0,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 0
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "曜金黑"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "128GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 曜金黑 128GB",
+      "price": "1399",
+      "skuTitle": "华为畅享 70 Pro 曜金黑 128GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//a46ecccf-bf9b-45ec-8540-8be6c2baf45d_28f296629cca865e.jpg",
+          "defaultImg": 1
+        }
+      ],
+      "descar": [
+        "曜金黑",
+        "128GB"
+      ],
+      "fullCount": 0,
+      "discount": 0,
+      "countStatus": 0,
+      "fullPrice": 0,
+      "reducePrice": 0,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 0
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "雪域白"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "256GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 雪域白 256GB",
+      "price": "1599",
+      "skuTitle": "华为畅享 70 Pro 雪域白 256GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//970707d1-c207-455d-8bd5-daf649e53776_b9840ff8da7762ae.jpg",
+          "defaultImg": 1
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        }
+      ],
+      "descar": [
+        "雪域白",
+        "256GB"
+      ],
+      "fullCount": 0,
+      "discount": 0,
+      "countStatus": 0,
+      "fullPrice": 0,
+      "reducePrice": 0,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 0
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 0
+        }
+      ]
+    },
+    {
+      "attr": [
+        {
+          "attrId": 9,
+          "attrName": "颜色",
+          "attrValue": "雪域白"
+        },
+        {
+          "attrId": 12,
+          "attrName": "版本",
+          "attrValue": "128GB"
+        }
+      ],
+      "skuName": "华为畅享 70 Pro 雪域白 128GB",
+      "price": "1399",
+      "skuTitle": "华为畅享 70 Pro 雪域白 128GB 1亿像素超清影像40W超级快充5000mAh大电池长续航 鸿蒙智能手机",
+      "skuSubtitle": "由 京东 发货, 并提供售后服务. 23:10前下单，预计明天送达",
+      "images": [
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//9a400d7f-82b7-4b6d-8654-01c48e9164fc_1f15cdbcf9e1273c.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//1adbbc2b-6035-4f4b-85c4-aa666be443a0_0d40c24b264aa511.jpg",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "https://lucy-typora.oss-cn-hangzhou.aliyuncs.com/2024-07-05//970707d1-c207-455d-8bd5-daf649e53776_b9840ff8da7762ae.jpg",
+          "defaultImg": 1
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        },
+        {
+          "imgUrl": "",
+          "defaultImg": 0
+        }
+      ],
+      "descar": [
+        "雪域白",
+        "128GB"
+      ],
+      "fullCount": 0,
+      "discount": 0,
+      "countStatus": 0,
+      "fullPrice": 0,
+      "reducePrice": 0,
+      "priceStatus": 0,
+      "memberPrice": [
+        {
+          "id": 2,
+          "name": "铜牌会员",
+          "price": 0
+        },
+        {
+          "id": 3,
+          "name": "银牌会员",
+          "price": 0
+        }
+      ]
+    }
+  ]
+}

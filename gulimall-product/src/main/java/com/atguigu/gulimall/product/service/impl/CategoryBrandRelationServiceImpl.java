@@ -1,12 +1,10 @@
 package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.exception.RRException;
-import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.BrandService;
 import com.atguigu.gulimall.product.service.CategoryService;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,5 +65,12 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         categoryBrandRelation.setBrandName(brand.getName());
         categoryBrandRelation.setCatelogName(category.getName());
         this.save(categoryBrandRelation);
+    }
+
+    @Override
+    public List<CategoryBrandRelationEntity> getRelatedBrands(Long catId) {
+        List<CategoryBrandRelationEntity> relationEntities = this.list(Wrappers.lambdaQuery(CategoryBrandRelationEntity.class)
+                .eq(CategoryBrandRelationEntity::getCatelogId, catId));
+        return relationEntities;
     }
 }

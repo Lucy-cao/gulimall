@@ -1,6 +1,10 @@
 package com.atguigu.gulimall.product.vo;
 
+import com.atguigu.gulimall.product.entity.AttrEntity;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class AttrGroupRespVo {
@@ -33,4 +37,9 @@ public class AttrGroupRespVo {
      * 所属分类级联
      */
     private String catelogNames;
+
+    /**
+     * 关联属性的信息
+     */
+    private List<AttrEntity> attrs = new ArrayList<>();
 }

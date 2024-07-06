@@ -21,5 +21,7 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
     List<CategoryBrandRelationEntity> queryByBrandId(Long brandId);
 
     void saveRelation(CategoryBrandRelationEntity categoryBrandRelation);
+
+    List<CategoryBrandRelationEntity> getRelatedBrands(Long catId);
 }
 
