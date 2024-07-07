@@ -3,6 +3,7 @@ package com.atguigu.gulimall.ware.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.toolkit.Sequence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,8 @@ import com.atguigu.common.utils.R;
 public class PurchaseDetailController {
     @Autowired
     private PurchaseDetailService purchaseDetailService;
+    @Autowired
+    private Sequence sequence;
 
     /**
      * 列表
@@ -59,6 +62,7 @@ public class PurchaseDetailController {
     @RequestMapping("/save")
     //@RequiresPermissions("ware:purchasedetail:save")
     public R save(@RequestBody PurchaseDetailEntity purchaseDetail){
+        purchaseDetail.setId(sequence.nextId());
 		purchaseDetailService.save(purchaseDetail);
 
         return R.ok();
