@@ -10,6 +10,12 @@ spring:
         namespace: d446200d-7d39-4774-9549-1aa7a17931c4
     gateway:
       routes:
+        - id: ware_route
+          uri: lb://gulimall-ware
+          predicates:
+            - Path=/api/ware/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*),/$\{segment}
         - id: product_route
           uri: lb://gulimall-product
           predicates:
