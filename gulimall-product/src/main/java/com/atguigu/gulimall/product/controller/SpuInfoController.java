@@ -5,11 +5,7 @@ import java.util.Map;
 
 import com.atguigu.gulimall.product.vo.sku.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.SpuInfoEntity;
 import com.atguigu.gulimall.product.service.SpuInfoService;
@@ -33,19 +29,28 @@ public class SpuInfoController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     //@RequiresPermissions("product:spuinfo:list")
     public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = spuInfoService.queryPage(params);
+        PageUtils page = spuInfoService.queryPageByCondition(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 商品上架
+     */
+    @PostMapping("/{spuId}/up")
+    public R spuUp(@PathVariable("spuId") Long spuId) {
+        spuInfoService.spuUp(spuId);
+        return R.ok();
     }
 
 
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @GetMapping("/info/{id}")
     //@RequiresPermissions("product:spuinfo:info")
     public R info(@PathVariable("id") Long id) {
         SpuInfoEntity spuInfo = spuInfoService.getById(id);
@@ -56,7 +61,7 @@ public class SpuInfoController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:spuinfo:save")
     public R save(@RequestBody SpuSaveVo spuSaveVo) {
         spuInfoService.saveSpuInfo(spuSaveVo);
@@ -67,7 +72,7 @@ public class SpuInfoController {
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:spuinfo:update")
     public R update(@RequestBody SpuInfoEntity spuInfo) {
         spuInfoService.updateById(spuInfo);
@@ -78,7 +83,7 @@ public class SpuInfoController {
     /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @PostMapping("/delete")
     //@RequiresPermissions("product:spuinfo:delete")
     public R delete(@RequestBody Long[] ids) {
         spuInfoService.removeByIds(Arrays.asList(ids));

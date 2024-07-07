@@ -9,10 +9,14 @@ import com.atguigu.gulimall.product.dao.AttrDao;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
 import com.atguigu.gulimall.product.service.*;
+import com.atguigu.gulimall.product.vo.SpuInfoVo;
 import com.atguigu.gulimall.product.vo.sku.BaseAttrs;
 import com.atguigu.gulimall.product.vo.sku.Images;
 import com.atguigu.gulimall.product.vo.sku.SpuSaveVo;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Sequence;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +54,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     SkuImagesService skuImagesService;
     @Autowired
     CouponFeignService couponFeignService;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    BrandService brandService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -206,6 +214,50 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         if (response.getCode() != 0) {
             throw new RRException("保存积分信息有问题，请联系管理员");
         }
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        //构造查询条件
+        LambdaQueryWrapper<SpuInfoEntity> wrapper = Wrappers.lambdaQuery();
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            wrapper.like(SpuInfoEntity::getSpuName, key);
+        }
+        String status = (String) params.get("status");
+        if (!StringUtils.isEmpty(status)) {
+            wrapper.eq(SpuInfoEntity::getPublishStatus, status);
+        }
+        String catelogId = (String) params.get("catelogId");
+        if (!StringUtils.isEmpty(catelogId) && !"0".equals(catelogId)) {
+            wrapper.eq(SpuInfoEntity::getCatalogId, catelogId);
+        }
+        String brandId = (String) params.get("brandId");
+        if (!StringUtils.isEmpty(brandId) && !"0".equals(brandId)) {
+            wrapper.eq(SpuInfoEntity::getBrandId, brandId);
+        }
+
+        //进行数据查询
+        IPage<SpuInfoEntity> page = this.page(new Query<SpuInfoEntity>().getPage(params), wrapper);
+        PageUtils pageUtils = new PageUtils(page);
+        List<SpuInfoVo> spuInfoVos = page.getRecords().stream().map(spuInfo -> {
+            SpuInfoVo spuInfoVo = new SpuInfoVo();
+            BeanUtils.copyProperties(spuInfo, spuInfoVo);
+            spuInfoVo.setCascaderNames(categoryService.getCascaderById(spuInfo.getCatalogId()).getCascaderNames());
+            spuInfoVo.setBrandName(brandService.getById(spuInfo.getBrandId()).getName());
+            return spuInfoVo;
+        }).collect(Collectors.toList());
+        pageUtils.setList(spuInfoVos);
+        return pageUtils;
+    }
+
+    @Override
+    public void spuUp(Long spuId) {
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        spuInfoEntity.setId(spuId);
+        spuInfoEntity.setPublishStatus(1);
+        spuInfoEntity.setUpdateTime(new Date());
+        this.updateById(spuInfoEntity);
     }
 
 }
