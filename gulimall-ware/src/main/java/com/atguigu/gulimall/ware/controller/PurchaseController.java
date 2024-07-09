@@ -2,9 +2,11 @@ package com.atguigu.gulimall.ware.controller;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import com.atguigu.gulimall.ware.vo.MergePurchaseVo;
+import com.atguigu.gulimall.ware.vo.PurchaseDoneVo;
 import com.baomidou.mybatisplus.core.toolkit.Sequence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +38,7 @@ public class PurchaseController {
     @RequestMapping("/list")
     //@RequiresPermissions("ware:purchase:list")
     public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = purchaseService.queryPage(params);
+        PageUtils page = purchaseService.queryPageByCondition(params);
 
         return R.ok().put("page", page);
     }
@@ -58,6 +60,30 @@ public class PurchaseController {
     @PostMapping("/merge")
     public R merge(@RequestBody MergePurchaseVo mergeVo) {
         purchaseService.mergePurchaseDetail(mergeVo);
+        return R.ok();
+    }
+
+    /**
+     * 领取采购单
+     *
+     * @param purchaseIds 采购单id
+     * @return
+     */
+    @PostMapping("/received")
+    public R received(@RequestBody List<Long> purchaseIds) {
+        purchaseService.received(purchaseIds);
+        return R.ok();
+    }
+
+    /**
+     * 完成采购单
+     *
+     * @param purchaseIds 采购单id
+     * @return
+     */
+    @PostMapping("/done")
+    public R done(@RequestBody PurchaseDoneVo purchaseDoneVo) {
+        purchaseService.done(purchaseDoneVo);
         return R.ok();
     }
 
@@ -93,6 +119,17 @@ public class PurchaseController {
     //@RequiresPermissions("ware:purchase:update")
     public R update(@RequestBody PurchaseEntity purchase) {
         purchaseService.updateById(purchase);
+
+        return R.ok();
+    }
+
+    /**
+     * 分配人员
+     */
+    @PostMapping("/allocateUser")
+    //@RequiresPermissions("ware:purchase:update")
+    public R allocateUser(@RequestBody PurchaseEntity purchase) {
+        purchaseService.allocateUser(purchase);
 
         return R.ok();
     }

@@ -15,6 +15,6 @@ import java.util.Map;
  */
 public interface PurchaseDetailService extends IService<PurchaseDetailEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryPageByCondition(Map<String, Object> params);
 }
 
