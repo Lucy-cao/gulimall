@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.product.service;
 
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
@@ -34,5 +35,7 @@ public interface AttrService extends IService<AttrEntity> {
     void deleteRelation(List<AttrGroupRelationVo> relationVos);
 
     PageUtils getNoRelatedAttr(Map<String, Object> params, Long attrGroupId);
+
+    List<ProductAttrValueEntity> getAttrListForSpu(Long spuId);
 }
 

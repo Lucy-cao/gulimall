@@ -1,9 +1,12 @@
 package com.atguigu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.atguigu.gulimall.product.constant.AttrTypeEnum;
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,8 @@ import com.atguigu.common.utils.R;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
 
     /**
      * 根据分类id查询规格参数
@@ -34,7 +39,7 @@ public class AttrController {
     @GetMapping("/base/list/{catId}")
     //@RequiresPermissions("product:attr:list")
     public R baseList(@RequestParam Map<String, Object> params,
-                  @PathVariable Long catId) {
+                      @PathVariable Long catId) {
         PageUtils page = attrService.queryPageByCatId(params, catId, AttrTypeEnum.BASE_ATTR.getCode());
 
         return R.ok().put("page", page);
@@ -50,6 +55,12 @@ public class AttrController {
         PageUtils page = attrService.queryPageByCatId(params, catId, AttrTypeEnum.SALE_ATTR.getCode());
 
         return R.ok().put("page", page);
+    }
+
+    @GetMapping("/base/listforspu/{spuId}")
+    public R getAttrListForSpu(@PathVariable("spuId") Long spuId) {
+        List<ProductAttrValueEntity> data = attrService.getAttrListForSpu(spuId);
+        return R.ok().put("data", data);
     }
 
 
@@ -81,6 +92,18 @@ public class AttrController {
     //@RequiresPermissions("product:attr:update")
     public R update(@RequestBody AttrVo attr) {
         attrService.updateDetailById(attr);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改spu的规格参数
+     */
+    @RequestMapping("/update/{spuId}")
+    //@RequiresPermissions("product:attr:update")
+    public R updateSpuAttr(@PathVariable("spuId") Long spuId,
+                           @RequestBody List<ProductAttrValueEntity> entities) {
+        productAttrValueService.updateSpuAttr(spuId, entities);
 
         return R.ok();
     }

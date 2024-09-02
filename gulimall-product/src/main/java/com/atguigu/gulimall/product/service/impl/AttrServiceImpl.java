@@ -5,7 +5,9 @@ import com.atguigu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimall.product.dao.AttrGroupDao;
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
+import com.atguigu.gulimall.product.entity.ProductAttrValueEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.service.ProductAttrValueService;
 import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
 import com.atguigu.gulimall.product.vo.AttrVo;
@@ -42,6 +44,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     AttrGroupDao attrGroupDao;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ProductAttrValueService productAttrValueService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -243,6 +247,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
         IPage<AttrEntity> page = this.page(new Query<AttrEntity>().getPage(params), wrapper);
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<ProductAttrValueEntity> getAttrListForSpu(Long spuId) {
+        List<ProductAttrValueEntity> list = productAttrValueService.list(
+                Wrappers.lambdaQuery(ProductAttrValueEntity.class)
+                        .eq(ProductAttrValueEntity::getSpuId, spuId));
+        return list;
     }
 
 }
