@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.service;
 
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
 import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
+import com.atguigu.gulimall.product.vo.CategoryLevel2Vo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
@@ -27,5 +28,9 @@ public interface CategoryService extends IService<CategoryEntity> {
     CategoryCascaderVo getCascaderById(Long catId);
 
     void updateDetail(CategoryEntity category);
+
+    List<CategoryEntity> getAllFirstLevelCat();
+
+    Map<Long,List<CategoryLevel2Vo>> getCatByLevel();
 }
 

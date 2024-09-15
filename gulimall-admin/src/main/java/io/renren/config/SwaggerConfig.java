@@ -27,7 +27,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig implements WebMvcConfigurer {
+public class SwaggerConfig implements  WebMvcConfigurer {
 
     @Bean
     public Docket createRestApi() {
