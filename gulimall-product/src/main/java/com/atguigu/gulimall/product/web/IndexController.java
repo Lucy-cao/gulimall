@@ -32,7 +32,7 @@ public class IndexController {
 		return "index";
 	}
 
-	@GetMapping("/getCatByLevel")
+	@GetMapping("/index/getCatByLevel")
 	@ResponseBody
 	public Map<Long,List<CategoryLevel2Vo>> getCatByLevel(){
 		Map<Long,List<CategoryLevel2Vo>> vos = categoryService.getCatByLevel();

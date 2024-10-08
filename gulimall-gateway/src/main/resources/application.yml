@@ -34,6 +34,10 @@ spring:
             - Path=/api/thirdparty/**
           filters:
             - RewritePath=/api/thirdparty/?(?<segment>.*),/$\{segment}
+        - id: web_index_route
+          uri: lb://gulimall-product
+          predicates:
+            - Host=**.gulimall.com
 
         # 跳转到renren-fast相关的接口服务中
         - id: admin_route
