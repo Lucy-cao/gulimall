@@ -6,13 +6,28 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 class GulimallProductApplicationTests {
     @Autowired
     BrandService brandService;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+    @Test
+    void testRedis(){
+        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+        //设置redis数据
+        opsForValue.set("hello","world_"+ UUID.randomUUID());
+        //读取redis数据
+        String hello = opsForValue.get("hello");
+        System.out.println("hello = " + hello);
+    }
     @Test
     void contextLoads() {
 //        BrandEntity brandEntity=new BrandEntity();

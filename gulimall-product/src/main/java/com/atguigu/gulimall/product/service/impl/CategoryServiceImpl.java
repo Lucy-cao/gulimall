@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.atguigu.gulimall.product.vo.CategoryCascaderVo;
 import com.atguigu.gulimall.product.vo.CategoryLevel2Vo;
@@ -8,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
 	@Autowired
 	CategoryBrandRelationDao categoryBrandRelationDao;
+	@Autowired
+	StringRedisTemplate redisTemplate;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -103,7 +108,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 	}
 
 	@Override
-	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel() {
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel(){
+		//加入缓存机制
+		// 如果redis里面存在分类数据，则直接获取；如果没有，从数据库获取，并保存入redis
+		String catalogJson = redisTemplate.opsForValue().get("catalogJson");
+		if(StringUtils.isEmpty(catalogJson)){
+			//redis不存在，从数据库获取
+			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDb();
+			//将数据库获取到的数据保存到redis
+			redisTemplate.opsForValue().set("catalogJson", JSON.toJSONString(catByLevelFromDb));
+			return catByLevelFromDb;
+		}
+		//redis已存在，将字符串转化为相应对象返回
+		Map<Long, List<CategoryLevel2Vo>> result = JSON.parseObject(catalogJson,
+				new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {});
+		return result;
+	}
+
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDb() {
 		Map<Long, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
 		//获取所有的分类
 		List<CategoryEntity> all = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
