@@ -11,9 +11,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -108,24 +110,65 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 	}
 
 	@Override
-	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel(){
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel() {
 		//加入缓存机制
 		// 如果redis里面存在分类数据，则直接获取；如果没有，从数据库获取，并保存入redis
 		String catalogJson = redisTemplate.opsForValue().get("catalogJson");
-		if(StringUtils.isEmpty(catalogJson)){
+		if (StringUtils.isEmpty(catalogJson)) {
 			//redis不存在，从数据库获取
-			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDb();
-			//将数据库获取到的数据保存到redis
-			redisTemplate.opsForValue().set("catalogJson", JSON.toJSONString(catByLevelFromDb));
+			System.out.println("缓存不命中。。。查询数据库");
+			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDbWithRedisLock();
 			return catByLevelFromDb;
 		}
 		//redis已存在，将字符串转化为相应对象返回
+		System.out.println("缓存命中。。。直接返回。。。");
 		Map<Long, List<CategoryLevel2Vo>> result = JSON.parseObject(catalogJson,
-				new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {});
+				new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {
+				});
 		return result;
 	}
 
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDbWithRedisLock() {
+		//分布式锁：基于各个服务到redis占坑的过程，假设有一个lock的key在redis已存在，后面的服务就不能再占到这个锁。
+		//redis的命令行：set key value nx  （nx是key不存在才能设置成功），对应代码是setIfAbsent
+		//添加过期时间和占锁必须是同步的，原子的
+		String uuid = UUID.randomUUID().toString();
+		Boolean lock = redisTemplate.opsForValue().setIfAbsent("lock", uuid, 300, TimeUnit.SECONDS);
+		Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb;
+		if (lock) {
+			try {
+				//加锁成功，查询数据
+				catByLevelFromDb = getCatByLevelFromDb();
+			}finally {
+				//查数据+对比删锁必须是原子操作，使用Lua脚本
+				String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
+				redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Arrays.asList("lock"), uuid);
+			}
+
+			//查询到数据之后，释放锁
+//			String lockValue = redisTemplate.opsForValue().get("lock");
+//			if(uuid.equals(lockValue)){
+//				//当前的锁的值是设置的自己的uuid才可以执行删除
+//				redisTemplate.delete("lock");
+//			}
+
+			return catByLevelFromDb;
+		} else {
+			//加锁不成功，等待100ms后重试
+			return getCatByLevelFromDbWithRedisLock();//使用自旋的方式
+		}
+	}
+
 	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDb() {
+		//再次校验redis中是否有数据，高并发情况下，可能前面线程已经获取过数据放到redis中
+		String catalogJson = redisTemplate.opsForValue().get("catalogJson");
+		if (!StringUtils.isEmpty(catalogJson)) {
+			Map<Long, List<CategoryLevel2Vo>> result = JSON.parseObject(catalogJson,
+					new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {
+					});
+			return result;
+		}
+		System.out.println("查询了数据库。。。");
 		Map<Long, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
 		//获取所有的分类
 		List<CategoryEntity> all = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
@@ -160,7 +203,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 			}).collect(Collectors.toList());
 			catLevels.put(level1CatId, level2Vos);
 		});
+
+		//将数据库获取到的数据保存到redis。需要放在加锁的方法内执行。
+		//如果放在加锁的方法外执行，可能出现前一个请求还未将查询到的数据放入redis，后一个请求已经占到锁，但是发现redis里面还是没数据，会再次查询数据库
+		redisTemplate.opsForValue().set("catalogJson", JSON.toJSONString(catLevels), 1, TimeUnit.DAYS);
 		return catLevels;
+	}
+
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDbWithLocalLock() {
+		//在此方法内通过同步块加锁
+		synchronized (this) {
+			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDb();
+			return catByLevelFromDb;
+		}
 	}
 
 	private List<CategoryEntity> getChildren(CategoryEntity root, List<CategoryEntity> all) {
