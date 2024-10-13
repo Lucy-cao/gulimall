@@ -4,6 +4,7 @@ import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.service.BrandService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ListOperations;
@@ -19,6 +20,8 @@ class GulimallProductApplicationTests {
     BrandService brandService;
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    RedissonClient redissonClient;
     @Test
     void testRedis(){
         ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
@@ -27,6 +30,11 @@ class GulimallProductApplicationTests {
         //读取redis数据
         String hello = opsForValue.get("hello");
         System.out.println("hello = " + hello);
+    }
+
+    @Test
+    public void testRedisson(){
+        System.out.println(redissonClient);
     }
     @Test
     void contextLoads() {
