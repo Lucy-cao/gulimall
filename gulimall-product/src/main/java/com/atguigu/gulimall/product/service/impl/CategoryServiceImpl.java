@@ -9,6 +9,8 @@ import com.atguigu.gulimall.product.vo.CategoryLevel3Vo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -36,6 +38,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 	CategoryBrandRelationDao categoryBrandRelationDao;
 	@Autowired
 	StringRedisTemplate redisTemplate;
+	@Autowired
+	RedissonClient redisson;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -117,7 +121,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		if (StringUtils.isEmpty(catalogJson)) {
 			//redis不存在，从数据库获取
 			System.out.println("缓存不命中。。。查询数据库");
-			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDbWithRedisLock();
+			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDbWithRedissonLock();
 			return catByLevelFromDb;
 		}
 		//redis已存在，将字符串转化为相应对象返回
@@ -126,6 +130,21 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 				new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {
 				});
 		return result;
+	}
+
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDbWithRedissonLock() {
+		//使用redisson添加分布式锁
+		//锁的颗粒度越细，程序执行越快。可以根据具体存放的数据去控制锁的粒度
+		RLock lock = redisson.getLock("catalog-lock");
+		Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb;
+		try {
+			//加锁成功，查询数据
+			catByLevelFromDb = getCatByLevelFromDb();
+		} finally {
+			//解锁
+			lock.unlock();
+		}
+		return catByLevelFromDb;
 	}
 
 	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelFromDbWithRedisLock() {
@@ -139,7 +158,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 			try {
 				//加锁成功，查询数据
 				catByLevelFromDb = getCatByLevelFromDb();
-			}finally {
+			} finally {
 				//查数据+对比删锁必须是原子操作，使用Lua脚本
 				String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
 				redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Arrays.asList("lock"), uuid);

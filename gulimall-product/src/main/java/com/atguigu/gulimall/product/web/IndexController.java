@@ -3,9 +3,7 @@ package com.atguigu.gulimall.product.web;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.CategoryLevel2Vo;
-import org.redisson.api.RLock;
-import org.redisson.api.RReadWriteLock;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -109,7 +107,7 @@ public class IndexController {
 			System.out.println("读锁加锁成功。。。" + Thread.currentThread().getId());
 			Thread.sleep(20000);//模拟业务长时间执行
 			str = redisTemplate.opsForValue().get("writeValue");
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			rLock.unlock();
@@ -118,4 +116,55 @@ public class IndexController {
 		return str;
 	}
 
+	/**
+	 * 闭锁演示
+	 * 场景：学校放假了，共有5个班级，5个班级的全部同学都走了才能锁大门
+	 */
+	//模拟锁门
+	@GetMapping("/lockDoor")
+	@ResponseBody
+	public String lockDoor() throws InterruptedException {
+		//创建闭锁
+		RCountDownLatch countDownLatch = redisson.getCountDownLatch("door-lock");
+		//设置倒数的数量
+		countDownLatch.trySetCount(5);
+		//等待闭锁都完成
+		countDownLatch.await();
+
+		return "放假了。。。";
+	}
+
+	//模拟学生离开班级
+	@GetMapping("/gogogo/{id}")
+	@ResponseBody
+	public String gogogo(@PathVariable("id") Long id) {
+		RCountDownLatch countDownLatch = redisson.getCountDownLatch("door-lock");
+		//每走一个班级，计数减一
+		countDownLatch.countDown();
+
+		return id + "班的人都走了";
+	}
+
+	/**
+	 * 信号量演示
+	 * 场景：假设一个停车场初始车位有3个，开进来一辆车占用一个车位，开走一辆车释放一个车位。
+	 * 当车位已经占满，后来的车就要等停车场有车开走释放才能再停
+	 * 在分布式场景中可以用来限流
+	 */
+	@GetMapping("/park")
+	@ResponseBody
+	public String park() throws InterruptedException {
+		RSemaphore park = redisson.getSemaphore("park");
+		park.acquire(); //获取一个信号值，也就是说占一个车位。如果数量为0了，则会阻塞等待有位子释放
+//		park.tryAcquire(); // 获取一个值，如果占不到位子了，就继续往下执行，就相当于先来看一看
+		return "ok，占到一个车位";
+	}
+
+	@GetMapping("leave")
+	@ResponseBody
+	public String leave(){
+		RSemaphore park = redisson.getSemaphore("park");
+		park.release();//释放一个车位
+		return "ok，释放一个车位";
+	}
 }
