@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -105,8 +106,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
 	}
 
+	@Cacheable(value = "category",key = "#root.method.name")
 	@Override
 	public List<CategoryEntity> getAllFirstLevelCat() {
+		System.out.println("执行了getAllFirstLevelCat。。。。");
 		List<CategoryEntity> list = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
 				.eq(CategoryEntity::getParentCid, 0)
 				.eq(CategoryEntity::getShowStatus, 1));
