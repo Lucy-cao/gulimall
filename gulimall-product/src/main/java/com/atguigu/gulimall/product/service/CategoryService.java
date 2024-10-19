@@ -31,6 +31,6 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     List<CategoryEntity> getAllFirstLevelCat();
 
-    Map<Long,List<CategoryLevel2Vo>> getCatByLevel();
+    Map<String,List<CategoryLevel2Vo>> getCatByLevel();
 }
 

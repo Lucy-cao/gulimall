@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.config;
 
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -23,7 +25,7 @@ public class MyCacheConfig {
 		//配置redis的key序列化方式为字符串
 		config = config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
 		//配置redis的value序列化方式为json
-		config = config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+		config = config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new FastJsonRedisSerializer<>(Object.class)));
 		//需要支持从配置文件读取配置项。需要指定当前配置类所需要绑定的配置文件
 		CacheProperties.Redis redisProperties = cacheProperties.getRedis();
 		//获取配置文件的过期时间ttl

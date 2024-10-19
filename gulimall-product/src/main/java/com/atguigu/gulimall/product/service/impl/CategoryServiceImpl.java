@@ -130,9 +130,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
 	@Cacheable(value = "category", key = "#root.methodName")
 	@Override
-	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel() {
+	public Map<String, List<CategoryLevel2Vo>> getCatByLevel() {
 		System.out.println("执行了getCatByLevel。。。" + Thread.currentThread().getId());
-		Map<Long, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
+		Map<String, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
 		//获取所有的分类
 		List<CategoryEntity> all = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
 				.eq(CategoryEntity::getShowStatus, 1));
@@ -164,7 +164,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
 				return categoryLevel2Vo;
 			}).collect(Collectors.toList());
-			catLevels.put(level1CatId, level2Vos);
+			catLevels.put(level1CatId.toString(), level2Vos);
 		});
 		return catLevels;
 	}
