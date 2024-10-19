@@ -9,10 +9,14 @@ import com.atguigu.gulimall.product.vo.CategoryLevel3Vo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.sun.xml.bind.annotation.OverrideAnnotationOf;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -98,37 +102,86 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		return cascaderVo;
 	}
 
+	//方案一：组合删除缓存
+//	@Caching(evict = {
+//			@CacheEvict(value = "category",key = "'getAllFirstLevelCat'"),
+//			@CacheEvict(value = "category",key = "'getCatByLevel'"),
+//	})
+	//方案二：删除同个分区下所有的缓存数据
+	@CacheEvict(value = "category", allEntries = true)
 	@Override
 	@Transactional
 	public void updateDetail(CategoryEntity category) {
+		System.out.println("执行了updateDetail。。" + Thread.currentThread().getId());
 		//更新详情，同时更新关联的冗余表
 		this.updateById(category);
 		categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
 	}
 
-	@Cacheable(value = "category",key = "#root.method.name")
+	@Cacheable(value = "category", key = "#root.method.name")
 	@Override
 	public List<CategoryEntity> getAllFirstLevelCat() {
-		System.out.println("执行了getAllFirstLevelCat。。。。");
+		System.out.println("执行了getAllFirstLevelCat。。。。" + Thread.currentThread().getId());
 		List<CategoryEntity> list = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
 				.eq(CategoryEntity::getParentCid, 0)
 				.eq(CategoryEntity::getShowStatus, 1));
 		return list;
 	}
 
+	@Cacheable(value = "category", key = "#root.methodName")
 	@Override
 	public Map<Long, List<CategoryLevel2Vo>> getCatByLevel() {
+		System.out.println("执行了getCatByLevel。。。" + Thread.currentThread().getId());
+		Map<Long, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
+		//获取所有的分类
+		List<CategoryEntity> all = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
+				.eq(CategoryEntity::getShowStatus, 1));
+
+		//获取所有一级分类
+		List<CategoryEntity> level1List = all.stream().filter(cat -> cat.getParentCid() == 0).collect(Collectors.toList());
+		level1List.forEach(level1 -> {
+			Long level1CatId = level1.getCatId();
+			//获取二级分类
+			List<CategoryEntity> level2List = all.stream().filter(cat -> Objects.equals(cat.getParentCid(), level1CatId))
+					.collect(Collectors.toList());
+
+			List<CategoryLevel2Vo> level2Vos = level2List.stream().map(level2 -> {
+				CategoryLevel2Vo categoryLevel2Vo = new CategoryLevel2Vo();
+				categoryLevel2Vo.setId(level2.getCatId());
+				categoryLevel2Vo.setName(level2.getName());
+				categoryLevel2Vo.setCatalog1Id(level1CatId);
+				//获取三级分类
+				List<CategoryEntity> level3List = all.stream().filter(cat -> Objects.equals(cat.getParentCid(), level2.getCatId()))
+						.collect(Collectors.toList());
+				List<CategoryLevel3Vo> level3Vos = level3List.stream().map(level3 -> {
+					CategoryLevel3Vo level3Vo = new CategoryLevel3Vo();
+					level3Vo.setId(level3.getCatId());
+					level3Vo.setName(level3.getName());
+					level3Vo.setCatalog2Id(level2.getCatId());
+					return level3Vo;
+				}).collect(Collectors.toList());
+				categoryLevel2Vo.setCatalog3List(level3Vos);
+
+				return categoryLevel2Vo;
+			}).collect(Collectors.toList());
+			catLevels.put(level1CatId, level2Vos);
+		});
+		return catLevels;
+	}
+
+
+	public Map<Long, List<CategoryLevel2Vo>> getCatByLevelOrigin() {
 		//加入缓存机制
 		// 如果redis里面存在分类数据，则直接获取；如果没有，从数据库获取，并保存入redis
 		String catalogJson = redisTemplate.opsForValue().get("catalogJson");
 		if (StringUtils.isEmpty(catalogJson)) {
 			//redis不存在，从数据库获取
-			System.out.println("缓存不命中。。。查询数据库");
+			System.out.println("缓存不命中。。。查询数据库" + Thread.currentThread().getId());
 			Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb = getCatByLevelFromDbWithRedissonLock();
 			return catByLevelFromDb;
 		}
 		//redis已存在，将字符串转化为相应对象返回
-		System.out.println("缓存命中。。。直接返回。。。");
+		System.out.println("缓存命中。。。直接返回。。。" + Thread.currentThread().getId());
 		Map<Long, List<CategoryLevel2Vo>> result = JSON.parseObject(catalogJson,
 				new TypeReference<Map<Long, List<CategoryLevel2Vo>>>() {
 				});
@@ -141,11 +194,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		RLock lock = redisson.getLock("catalog-lock");
 		Map<Long, List<CategoryLevel2Vo>> catByLevelFromDb;
 		try {
+			lock.lock();
+			System.out.println("加锁成功。。。" + Thread.currentThread().getId());
 			//加锁成功，查询数据
 			catByLevelFromDb = getCatByLevelFromDb();
 		} finally {
 			//解锁
 			lock.unlock();
+			System.out.println("释放锁。。。" + Thread.currentThread().getId());
 		}
 		return catByLevelFromDb;
 	}
@@ -190,7 +246,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 					});
 			return result;
 		}
-		System.out.println("查询了数据库。。。");
+		System.out.println("查询了数据库。。。" + Thread.currentThread().getId());
 		Map<Long, List<CategoryLevel2Vo>> catLevels = new HashMap<>();
 		//获取所有的分类
 		List<CategoryEntity> all = this.list(Wrappers.lambdaQuery(CategoryEntity.class)
