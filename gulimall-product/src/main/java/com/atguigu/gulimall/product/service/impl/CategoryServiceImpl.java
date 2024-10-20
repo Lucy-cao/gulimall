@@ -118,7 +118,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
 	}
 
-	@Cacheable(value = "category", key = "#root.method.name")
+	@Cacheable(value = "category", key = "#root.method.name", sync = true)
 	@Override
 	public List<CategoryEntity> getAllFirstLevelCat() {
 		System.out.println("执行了getAllFirstLevelCat。。。。" + Thread.currentThread().getId());
@@ -128,7 +128,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 		return list;
 	}
 
-	@Cacheable(value = "category", key = "#root.methodName")
+	@Cacheable(value = "category", key = "#root.methodName", sync = true)
 	@Override
 	public Map<String, List<CategoryLevel2Vo>> getCatByLevel() {
 		System.out.println("执行了getCatByLevel。。。" + Thread.currentThread().getId());
