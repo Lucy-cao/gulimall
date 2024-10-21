@@ -37,7 +37,11 @@ spring:
         - id: web_index_route
           uri: lb://gulimall-product
           predicates:
-            - Host=**.gulimall.com
+            - Host=gulimall.com
+        - id: web_search_route
+          uri: lb://gulimall-search
+          predicates:
+            - Host=search.gulimall.com
 
         # 跳转到renren-fast相关的接口服务中
         - id: admin_route
