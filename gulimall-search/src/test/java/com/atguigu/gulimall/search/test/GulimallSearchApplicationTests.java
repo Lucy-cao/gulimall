@@ -17,6 +17,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.elastic.clients.util.ApiTypeHelper;
+import com.atguigu.gulimall.search.constant.EsConstant;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.junit.jupiter.api.Test;
@@ -319,5 +320,25 @@ class GulimallSearchApplicationTests {
 				.aggregations("price-histogram", price));
 		SearchResponse<Product> search = esClient.search(request, Product.class);
 		System.out.println("search = " + search);
+	}
+
+	@Test
+	public void test(){
+//		String skuPrice = "_500";
+//		List<String> skuRange = Arrays.asList(skuPrice.split("_"));
+//		System.out.println("1");
+//
+//		skuPrice = "500_";
+//		skuRange = Arrays.asList(skuPrice.split("_"));
+//		System.out.println("1");
+//
+//		skuPrice = "10_500";
+//		skuRange = Arrays.asList(skuPrice.split("_"));
+//		System.out.println("1");
+
+		int ceil =(int) Math.ceil(3.0 / 2.0);
+		System.out.println(1);
+		ceil = (int) Math.ceil(4 / 2);
+		System.out.println(1);
 	}
 }
