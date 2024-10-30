@@ -13,9 +13,14 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.SourceConfigBuilders;
 import co.elastic.clients.json.JsonData;
 import co.elastic.clients.util.ObjectBuilder;
+import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.to.SkuHasStockVo;
 import com.atguigu.common.to.es.SkuEsModel;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.search.constant.EsConstant;
+import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.SearchService;
+import com.atguigu.gulimall.search.vo.AttrVo;
 import com.atguigu.gulimall.search.vo.SearchParam;
 import com.atguigu.gulimall.search.vo.SearchResult;
 import lombok.val;
@@ -32,6 +37,8 @@ import java.util.stream.Stream;
 public class SearchServiceImpl implements SearchService {
 	@Autowired
 	private ElasticsearchClient esClient;
+	@Autowired
+	private ProductFeignService productFeignService;
 
 	@Override
 	public SearchResult search(SearchParam param) {
@@ -54,10 +61,10 @@ public class SearchServiceImpl implements SearchService {
 	private SearchResult buildSearchResult(SearchResponse<SkuEsModel> response, SearchParam param) {
 		SearchResult result = new SearchResult();
 		//1、返回所有查询到的商品，如果有关键词，则获取高亮的结果
-		List<SkuEsModel> products = response.hits().hits().stream().map(hit->{
+		List<SkuEsModel> products = response.hits().hits().stream().map(hit -> {
 			SkuEsModel esModel = hit.source();
 			//判断是否需要获取高亮的标题
-			if(!StringUtils.isEmpty(param.getKeyword())){
+			if (!StringUtils.isEmpty(param.getKeyword())) {
 				String skuTitle = hit.highlight().get("skuTitle").get(0);
 				esModel.setSkuTitle(skuTitle);
 			}
@@ -124,6 +131,28 @@ public class SearchServiceImpl implements SearchService {
 //		//5、分页信息-总页数
 		int totalPage = (int) Math.ceil((double) total / (double) EsConstant.PRODUCT_PAGESIZE);
 		result.setTotalPage(totalPage);
+
+		//6、获取面包屑导航的数据
+		List<SearchResult.NavVo> navVos = new ArrayList<>();
+		if(param.getAttrs()!=null){
+			navVos = param.getAttrs().stream().map(attr -> {
+				SearchResult.NavVo navVo = new SearchResult.NavVo();
+				String[] s = attr.split("_");
+				//设置属性值
+				navVo.setNavValue(s[1]);
+				//获取属性名
+				R res = productFeignService.getAttrById(Long.parseLong(s[0]));
+				if (res.getCode() == 0) {
+					AttrVo data = res.getData(new TypeReference<AttrVo>() {});
+					navVo.setNavName(data.getAttrName());
+				} else {
+					navVo.setNavName(s[0]);
+				}
+				return navVo;
+			}).collect(Collectors.toList());
+		}
+
+		result.setNavs(navVos);
 
 		return result;
 	}

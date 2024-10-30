@@ -1021,12 +1021,21 @@
                 <div class="filter">
                     <!--综合排序-->
                     <div class="filter_top">
-                        <div class="filter_top_left">
-                            <a href="#">综合排序</a>
-                            <a href="#">销量</a>
-                            <a href="#">价格</a>
-                            <a href="#">评论分</a>
-                            <a href="#">上架时间</a>
+                        <div class="filter_top_left" th:with="p=${param.sort}">
+                            <!--                               th:class="${((#strings.isEmpty(p) || #strings.startsWith(p,'hotScore')) && (#strings.endsWith(p,'desc')))?'sort_a desc':'sort_a'}"-->
+                            <a class="sort_a"
+                               th:attr="style=${(#strings.isEmpty(p) || #strings.startsWith(p,'hotScore'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border-color:#CCC;background:#FFF'}"
+                               sort="hotScore" href="#">综合排序</a>
+                            <!--                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount') && #strings.endsWith(p,'desc'))?'sort_a desc':'sort_a'}"-->
+                            <a class="sort_a"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border-color:#CCC;background:#FFF'}"
+                               sort="saleCount" href="#">销量</a>
+                            <!--                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc'))?'sort_a desc':'sort_a'}"-->
+                            <a class="sort_a"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice'))?'color:#FFF;border-color:#e4393c;background:#e4393c':'color:#333;border-color:#CCC;background:#FFF'}"
+                               sort="skuPrice" href="#">价格</a>
+                            <a class="sort_a" sort="hotScore" href="#">评论分</a>
+                            <a class="sort_a" href="#">上架时间</a>
                         </div>
                         <div class="filter_top_right">
                             <span class="fp-text">
@@ -1983,35 +1992,71 @@
         var pn = $(this).attr("pn");
         var href = location.href;
         //如果路径里面存在页码了，则需要替换，否则拼接
-        if(href.indexOf("pageNum")!=-1){
-            //替换
-            location.href = replaceParamVal(href, "pageNum", pn);
-        }else{
-            searchProducts("pageNum", pn);
-        }
-
+        location.href = replaceAndAddParamVal(href, "pageNum", pn);
         return false; //禁用默认行为，以防有跳转到其他网址的超链接
     })
 
-    function replaceParamVal(url, paramName, replaceVal){
+    function replaceAndAddParamVal(url, paramName, replaceVal){
         var ourl = url.toString();
-        var re = eval(`/(${paramName}=)([^&]*)/gi`);
-        var nurl = ourl.replace(re, paramName + '=' + replaceVal);
-        return nurl;
+        //如果参数在地址存在，则替换，否则添加
+        if(ourl.indexOf(paramName)!=-1){
+            var re = eval(`/(${paramName}=)([^&]*)/gi`);
+            var nurl = ourl.replace(re, paramName + '=' + replaceVal);
+            return nurl;
+        }else {
+            var nurl = "";
+            if(ourl.indexOf("?")!=-1){
+                nurl = ourl + "&" +paramName + "=" + replaceVal;
+            }else {
+                nurl = ourl + "?" +paramName + "=" + replaceVal;
+            }
+            return nurl;
+        }
     }
 
     $(".page_submit").click(function (){
         var pagenum=$("#pagenum_input").val();
         var href = location.href;
         //如果路径里面存在页码了，则需要替换，否则拼接
-        if(href.indexOf("pageNum")!=-1){
-            //替换
-            location.href = replaceParamVal(href, "pageNum", pagenum);
-        }else{
-            searchProducts("pageNum", pagenum);
-        }
+        location.href = replaceAndAddParamVal(href, "pageNum", pagenum);
         return false;
     })
+
+    $(".sort_a").click(function (){
+        //1、改变元素的样式
+        changeStyle(this);
+        //2、拼接排序的条件搜索
+        var field = $(this).attr("sort");
+        var sortValue = $(this).hasClass("desc")?field + "_desc":field + "_asc";
+        var href = location.href;
+        href = replaceAndAddParamVal(href, "sort", sortValue);
+        location.href = replaceAndAddParamVal(href, "pageNum", 1)
+
+        return false; //禁用a标签的默认行为
+    })
+
+    function changeStyle(ele){
+        //清空所有的样式
+        $(".sort_a").css({});
+        //给点击的元素添加样式
+        $(ele).css({"color":"#FFF","border-color":"#e4393c","background":"#e4393c"});
+
+        //改变升降序
+        $(ele).toggleClass("desc");//加上desc就是降序，不加就是升序
+        //将其他兄弟元素的升降符号去掉
+        $(".sort_a").each(function (i){
+            this.text = this.text.replace("↑","").replace("↓","");
+        })
+        var text = $(ele).text();
+        if($(ele).hasClass("desc")){
+            //降序
+            text = text +"↓";
+        }else{
+            //升序
+            text = text +"↑";
+        }
+        $(ele).text(text);
+    }
 </script>
 </body>
 </html>

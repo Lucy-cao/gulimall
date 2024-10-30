@@ -119,4 +119,13 @@ public class AttrController {
         return R.ok();
     }
 
+    /**
+     * 根据属性id获取属性信息
+     */
+    @GetMapping("/getAttrById/{attrId}")
+    public R getAttrById(@PathVariable("attrId") Long attrId) {
+        AttrEntity respVo = attrService.getById(attrId);
+        return R.ok().put("data", respVo);
+    }
+
 }
