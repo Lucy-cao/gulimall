@@ -8,6 +8,7 @@ import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
 import com.atguigu.gulimall.product.vo.AttrGroupRespVo;
+import com.atguigu.gulimall.product.vo.sku.SkuItemVo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.BeanUtils;
@@ -113,4 +114,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         return respVos;
     }
+
+	@Override
+	public List<SkuItemVo.SpuAttrGroupVo> getSpuGroupAttrs(Long catalogId, Long spuId) {
+        List<SkuItemVo.SpuAttrGroupVo> spuAttrGroupVos = this.baseMapper.getSpuGroupAttrs(catalogId, spuId);
+		return spuAttrGroupVos;
+	}
 }

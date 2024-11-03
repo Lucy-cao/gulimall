@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.service;
 
 import com.atguigu.gulimall.product.vo.AttrGroupRespVo;
+import com.atguigu.gulimall.product.vo.sku.SkuItemVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimall.product.entity.AttrGroupEntity;
@@ -24,5 +25,7 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
     AttrGroupEntity getCascaderById(Long attrGroupId);
 
     List<AttrGroupRespVo> getAttrGroupWithAttrByCatlogId(Long catelogId);
+
+	List<SkuItemVo.SpuAttrGroupVo> getSpuGroupAttrs(Long catalogId, Long spuId);
 }
 
