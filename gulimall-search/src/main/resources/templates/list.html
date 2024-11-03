@@ -18,7 +18,7 @@
     <div class="header_head_box">
         <b class="header_head_p">
             <div style="overflow: hidden">
-                <a href="http://gulimall.com:9090" class="header_head_p_a1" style="width:73px;">
+                <a href="http://gulimall.com:9099" class="header_head_p_a1" style="width:73px;">
                     谷粒商城首页
                 </a>
                 <a href="#" class="header_head_p_a">
@@ -400,7 +400,7 @@
 <!--搜索导航-->
 <div class="header_sous">
     <div class="logo">
-        <a href="http://gulimall.com:9090"><img src="/static/search/image/logo1.jpg" alt=""></a>
+        <a href="http://gulimall.com:9099"><img src="/static/search/image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
         <input id="keyword_input" type="text" placeholder="手机" th:value="${param.keyword}"/>
@@ -1167,7 +1167,7 @@
                                 <a href="#">关注</a>
                             </div>
                             <p class="da">
-                                <a href="#">
+                                <a th:href="${'http://item.gulimall.com:9099/'+product.skuId+'.html'}">
                                     <img th:src="${product.skuImg}" class="dim">
                                 </a>
                             </p>
