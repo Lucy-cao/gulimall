@@ -1495,6 +1495,27 @@
 	<script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
 	<script type="text/javascript">
+		$(".sale_attr_value").click(function (){
+			//1、获取当前点击元素的skus
+			var skus = new Array();
+			var curr = $(this).attr("skus").split(",");
+			skus.push(curr);
+			//2、去掉同一行所有的checked
+			$(this).parent().parent().find(".sale_attr_value").removeClass("checked");
+
+			//3、获取其他所有checked的skus，并取交集
+			$("a[class='sale_attr_value checked']").each(function (){
+				skus.push($(this).attr("skus").split(","));
+			});
+			var filterEle = skus[0];
+			for(var i=1;i<skus.length;i++){
+				filterEle = $(filterEle).filter(skus[i]);
+			}
+
+			//4、跳转
+			location.href = "http://item.gulimall.com:9099/"+filterEle[0]+".html";
+		});
+
 		$(function (){
 			$(".sale_attr_value").parent().css({"border":"solid 1px #CCCCCC"});
 			$("a[class='sale_attr_value checked']").parent().css({"border":"solid 1px red"});
