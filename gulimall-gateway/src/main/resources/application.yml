@@ -42,6 +42,10 @@ spring:
           uri: lb://gulimall-search
           predicates:
             - Host=search.gulimall.com
+        - id: web_auth_route
+          uri: lb://gulimall-auth-server
+          predicates:
+            - Host=auth.gulimall.com
 
         # 跳转到renren-fast相关的接口服务中
         - id: admin_route
