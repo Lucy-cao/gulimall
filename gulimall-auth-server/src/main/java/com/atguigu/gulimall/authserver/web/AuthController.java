@@ -5,13 +5,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AuthController {
-	@GetMapping("/login.html")
-	public String loginPage(){
-		return "login";
-	}
-
-	@GetMapping("/register.html")
-	public String registerPage(){
-		return "register";
-	}
+//	@GetMapping("/login.html")
+//	public String loginPage(){
+//		return "login";
+//	}
+//
+//	@GetMapping("/register.html")
+//	public String registerPage(){
+//		return "register";
+//	}
 }
