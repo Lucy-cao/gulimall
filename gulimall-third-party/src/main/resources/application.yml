@@ -11,5 +11,9 @@ spring:
   config:
     import:
       - nacos:oss.yml?refreshEnabled=true&group=dev
+  sms:
+    host: https://zwp.market.alicloudapi.com
+    path: /sms/sendv2
+    appcode: a0aeb985ad3f4f3089d4b61036ecca3b
 server:
   port: 30000
