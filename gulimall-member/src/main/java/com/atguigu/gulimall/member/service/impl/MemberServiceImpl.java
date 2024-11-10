@@ -6,6 +6,7 @@ import com.atguigu.common.exception.RRException;
 import com.atguigu.gulimall.member.entity.MemberLevelEntity;
 import com.atguigu.gulimall.member.service.MemberLevelService;
 import com.atguigu.gulimall.member.vo.RegisterParam;
+import com.atguigu.gulimall.member.vo.UserLoginParam;
 import com.baomidou.mybatisplus.core.toolkit.Sequence;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,25 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 		//保存用户数据
 		this.save(memberEntity);
 		return memberEntity.getId();
+	}
+
+	@Override
+	public MemberEntity login(UserLoginParam param) {
+		//查询数据是否存在此用户
+		MemberEntity entity = this.getOne(Wrappers.lambdaQuery(MemberEntity.class)
+				.eq(MemberEntity::getUsername, param.getLoginacc())
+				.or().eq(MemberEntity::getMobile, param.getLoginacc()));
+		if (entity == null) {
+			throw new RRException("用户不存在");
+		}
+
+		//若存在，验证密码是否正确
+		boolean matches = encoder.matches(param.getPassword(), entity.getPassword());
+		if(!matches){
+			throw new RRException("密码错误");
+		}
+
+		return entity;
 	}
 
 }

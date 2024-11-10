@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -35,6 +37,7 @@ public class MemberEntity implements Serializable {
 	/**
 	 * 密码
 	 */
+	@JsonIgnore
 	private String password;
 	/**
 	 * 昵称

@@ -4,6 +4,7 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.authserver.feign.MemberFeignService;
 import com.atguigu.gulimall.authserver.feign.ThirdPartyFeignService;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
+import com.atguigu.gulimall.authserver.vo.UserLoginParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -118,6 +119,19 @@ public class AuthController {
 			return "redirect:http://auth.gulimall.com:9099/register.html";
 		}
 		//注册成功，重定向到登录页面
+		return "redirect:http://auth.gulimall.com:9099/login.html";
+	}
+
+	@PostMapping("/login")
+	public String login(UserLoginParam param, RedirectAttributes attributes) {
+		//调用远程登录服务
+		R login = memberFeignService.login(param);
+		if (login.getCode() == 0) {
+			return "redirect:http://gulimall.com:9099";
+		}
+		Map<String, String> errors = new HashMap<>();
+		errors.put("msg", login.getMsg());
+		attributes.addFlashAttribute("errors", errors);
 		return "redirect:http://auth.gulimall.com:9099/login.html";
 	}
 }
