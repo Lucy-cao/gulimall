@@ -12,3 +12,6 @@ spring:
     name: "gulimall-auth-server"
   thymeleaf:
     cache: false
+  redis:
+    host: 120.26.84.61
+    password: abc,,,123
