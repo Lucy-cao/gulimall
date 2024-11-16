@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimall.product.service.AttrAttrgroupRelationService;
@@ -33,7 +29,7 @@ public class AttrAttrgroupRelationController {
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @GetMapping("/list")
     //@RequiresPermissions("product:attrattrgrouprelation:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = attrAttrgroupRelationService.queryPage(params);
@@ -45,7 +41,7 @@ public class AttrAttrgroupRelationController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}")
+    @RequestMapping(value = "/info/{id}", method = RequestMethod.GET)
     //@RequiresPermissions("product:attrattrgrouprelation:info")
     public R info(@PathVariable("id") Long id){
 		AttrAttrgroupRelationEntity attrAttrgroupRelation = attrAttrgroupRelationService.getById(id);
