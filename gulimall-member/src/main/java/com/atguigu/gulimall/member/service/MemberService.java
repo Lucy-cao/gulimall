@@ -22,5 +22,7 @@ public interface MemberService extends IService<MemberEntity> {
 	Long register(RegisterParam registerParam);
 
 	MemberEntity login(UserLoginParam param);
+
+	MemberEntity oauthLogin(MemberEntity member);
 }
 

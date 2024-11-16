@@ -1,26 +1,13 @@
-package com.atguigu.gulimall.member.entity;
+package com.atguigu.gulimall.authserver.vo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-/**
- * 会员
- *
- * @author lucy
- * @email caolu8815@163.com
- * @date 2024-05-21 17:48:35
- */
-@Data
-@TableName("ums_member")
-public class MemberEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+import java.util.Date;
 
+@Data
+public class SocialUserParam {
 	/**
 	 * id
 	 */
@@ -100,7 +87,7 @@ public class MemberEntity implements Serializable {
 	 */
 	private String socialUid;
 	/**
-	 * 访问令牌
+	 * '访问令牌'
 	 */
 	private String accessToken;
 	/**

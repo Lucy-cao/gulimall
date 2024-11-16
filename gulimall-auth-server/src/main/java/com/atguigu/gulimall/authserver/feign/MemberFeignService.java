@@ -2,6 +2,7 @@ package com.atguigu.gulimall.authserver.feign;
 
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
+import com.atguigu.gulimall.authserver.vo.SocialUserParam;
 import com.atguigu.gulimall.authserver.vo.UserLoginParam;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,5 +14,8 @@ public interface MemberFeignService {
 	R register(@RequestBody RegisterParam registerParam);
 
 	@PostMapping("/member/member/login")
-	public R login(@RequestBody UserLoginParam param);
+	R login(@RequestBody UserLoginParam param);
+
+	@PostMapping("/member/member/oauthLogin")
+	R oauthLogin(@RequestBody SocialUserParam param);
 }

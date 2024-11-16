@@ -1,11 +1,17 @@
 package com.atguigu.gulimall.authserver.web;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.atguigu.common.utils.HttpUtils;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.authserver.feign.MemberFeignService;
 import com.atguigu.gulimall.authserver.feign.ThirdPartyFeignService;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
+import com.atguigu.gulimall.authserver.vo.SocialUserParam;
 import com.atguigu.gulimall.authserver.vo.UserLoginParam;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -17,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -132,6 +139,54 @@ public class AuthController {
 		Map<String, String> errors = new HashMap<>();
 		errors.put("msg", login.getMsg());
 		attributes.addFlashAttribute("errors", errors);
+		return "redirect:http://auth.gulimall.com:9099/login.html";
+	}
+
+	@GetMapping("/oauth2/{source}/success")
+	public String oauthSuccess(@PathVariable("source") String source, @RequestParam("code") String code) throws Exception {
+		//oauth接口回调方法
+		//根据授权码code获取访问令牌access_token
+		Map<String, String> querys = new HashMap<>();
+		//redirect_uri={redirect_uri}&client_secret={client_secret}
+		querys.put("grant_type", "authorization_code");
+		querys.put("code", code);
+		querys.put("client_id", "08e664ea37adb63cb0fcaa2f61a57a346d0a59a325f4ed7c18ead9a9d6fc1a0c");
+		querys.put("redirect_uri", "http://auth.gulimall.com:9099/oauth2/gitee/success");
+		Map<String, String> body = new HashMap<>();
+		body.put("client_secret", "3cc75b01952fa774d3f723f1215045f42a2d25cf009fba9d31f1a4b4c8a7f829");
+		HttpResponse response = HttpUtils.doPost("https://gitee.com", "/oauth/token", "post",
+				new HashMap<String, String>(), querys, body);
+		if (response.getStatusLine().getStatusCode() == 200) {
+			// 成功获取访问令牌
+			String json = EntityUtils.toString(response.getEntity());
+			JSONObject jsonObject = JSON.parseObject(json);
+			String accessToken = jsonObject.getString("access_token");
+			String expiresIn = jsonObject.getString("expires_in");
+			// 使用访问令牌获取用户信息
+			Map<String, String> getQuery = new HashMap<>();
+			getQuery.put("access_token", accessToken);
+			HttpResponse userResponse = HttpUtils.doGet("https://gitee.com", "/api/v5/user", "get",
+					new HashMap<>(), getQuery);
+			if (userResponse.getStatusLine().getStatusCode() == 200){
+				String userJson = EntityUtils.toString(userResponse.getEntity());
+				JSONObject userJsonObject = JSON.parseObject(userJson);
+
+				// 调用远程用户服务，添加用户，与第三方应用建立绑定关系
+				SocialUserParam socialUserParam = new SocialUserParam();
+				socialUserParam.setUsername(userJsonObject.getString("name"));
+				socialUserParam.setHeader(userJsonObject.getString("avatar_url"));
+				socialUserParam.setNickname(userJsonObject.getString("name"));
+				socialUserParam.setSocialUid(userJsonObject.getString("id"));
+				socialUserParam.setAccessToken(accessToken);
+				socialUserParam.setExpires_in(expiresIn);
+				R feignResponse = memberFeignService.oauthLogin(socialUserParam);
+				if(feignResponse.getCode()==0){
+					// 成功则返回首页
+					return "redirect:http://gulimall.com:9099";
+				}
+			}
+		}
+		//失败则重定向到登录页面
 		return "redirect:http://auth.gulimall.com:9099/login.html";
 	}
 }

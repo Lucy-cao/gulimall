@@ -114,4 +114,10 @@ public class MemberController {
 		return R.ok();
 	}
 
+	@PostMapping("/oauthLogin")
+	public R oauthLogin(@RequestBody MemberEntity member){
+		MemberEntity user = memberService.oauthLogin(member);
+		return R.ok(user);
+	}
+
 }

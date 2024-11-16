@@ -92,4 +92,25 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 		return entity;
 	}
 
+	@Override
+	public MemberEntity oauthLogin(MemberEntity member) {
+		//获取社交用户的id，如果系统里没有则新建，否则更新
+		MemberEntity memberEntity = this.getOne(Wrappers.lambdaQuery(MemberEntity.class).eq(MemberEntity::getSocialUid, member.getSocialUid()));
+		if(memberEntity != null){
+			//已存在用户，更新
+			memberEntity.setAccessToken(member.getAccessToken());
+			memberEntity.setExpires_in(member.getExpires_in());
+			this.updateById(memberEntity);
+			return memberEntity;
+		}else {
+			//用户不存在，保存
+			member.setId(sequence.nextId());
+			member.setLevelId(memberLevelService.getDefaultLevel().getId());
+			member.setStatus(1);
+			member.setCreateTime(DateTime.now());
+			this.save(member);
+			return member;
+		}
+	}
+
 }
