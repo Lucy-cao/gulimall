@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class SocialUserParam {
+public class SocialUserParam implements Serializable {
 	/**
 	 * id
 	 */
