@@ -2,8 +2,10 @@ package com.atguigu.gulimall.authserver.web;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.utils.HttpUtils;
 import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.authserver.config.GiteeConfiguration;
 import com.atguigu.gulimall.authserver.feign.MemberFeignService;
 import com.atguigu.gulimall.authserver.feign.ThirdPartyFeignService;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
@@ -15,15 +17,13 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.validation.Valid;
-import java.math.BigInteger;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -40,6 +40,8 @@ public class AuthController {
 	private MemberFeignService memberFeignService;
 	@Autowired
 	private StringRedisTemplate redisTemplate;
+	@Autowired
+	private GiteeConfiguration giteeConfig;
 
 	/**
 	 * 发送短信验证码，同手机号防刷，保存进redis
@@ -143,17 +145,18 @@ public class AuthController {
 	}
 
 	@GetMapping("/oauth2/{source}/success")
-	public String oauthSuccess(@PathVariable("source") String source, @RequestParam("code") String code) throws Exception {
+	public String oauthSuccess(@PathVariable("source") String source, @RequestParam("code") String code,
+							   HttpSession session) throws Exception {
 		//oauth接口回调方法
 		//根据授权码code获取访问令牌access_token
 		Map<String, String> querys = new HashMap<>();
 		//redirect_uri={redirect_uri}&client_secret={client_secret}
 		querys.put("grant_type", "authorization_code");
 		querys.put("code", code);
-		querys.put("client_id", "08e664ea37adb63cb0fcaa2f61a57a346d0a59a325f4ed7c18ead9a9d6fc1a0c");
+		querys.put("client_id", giteeConfig.getClientId());
 		querys.put("redirect_uri", "http://auth.gulimall.com:9099/oauth2/gitee/success");
 		Map<String, String> body = new HashMap<>();
-		body.put("client_secret", "3cc75b01952fa774d3f723f1215045f42a2d25cf009fba9d31f1a4b4c8a7f829");
+		body.put("client_secret", giteeConfig.getClientSecret());
 		HttpResponse response = HttpUtils.doPost("https://gitee.com", "/oauth/token", "post",
 				new HashMap<String, String>(), querys, body);
 		if (response.getStatusLine().getStatusCode() == 200) {
@@ -167,7 +170,7 @@ public class AuthController {
 			getQuery.put("access_token", accessToken);
 			HttpResponse userResponse = HttpUtils.doGet("https://gitee.com", "/api/v5/user", "get",
 					new HashMap<>(), getQuery);
-			if (userResponse.getStatusLine().getStatusCode() == 200){
+			if (userResponse.getStatusLine().getStatusCode() == 200) {
 				String userJson = EntityUtils.toString(userResponse.getEntity());
 				JSONObject userJsonObject = JSON.parseObject(userJson);
 
@@ -180,7 +183,11 @@ public class AuthController {
 				socialUserParam.setAccessToken(accessToken);
 				socialUserParam.setExpires_in(expiresIn);
 				R feignResponse = memberFeignService.oauthLogin(socialUserParam);
-				if(feignResponse.getCode()==0){
+				if (feignResponse.getCode() == 0) {
+					SocialUserParam user = feignResponse.getData(new TypeReference<SocialUserParam>() {
+					});
+					System.out.println("成功登录：" + user);
+					session.setAttribute("loginUser", user);
 					// 成功则返回首页
 					return "redirect:http://gulimall.com:9099";
 				}

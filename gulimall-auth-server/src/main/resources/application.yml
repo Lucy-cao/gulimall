@@ -15,3 +15,9 @@ spring:
   redis:
     host: 120.26.84.61
     password: abc,,,123
+gulimall:
+  oauth2:
+    gitee:
+      client-id: 08e664ea37adb63cb0fcaa2f61a57a346d0a59a325f4ed7c18ead9a9d6fc1a0c
+      client-secret: 3cc75b01952fa774d3f723f1215045f42a2d25cf009fba9d31f1a4b4c8a7f829
+
