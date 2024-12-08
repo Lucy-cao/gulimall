@@ -66,6 +66,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 		//密码需要进行加密
 		memberEntity.setPassword(encoder.encode(registerParam.getPassword()));
 		memberEntity.setUsername(registerParam.getUserName());
+		memberEntity.setNickname(registerParam.getUserName());
 		memberEntity.setCreateTime(DateTime.now());
 		memberEntity.setStatus(StatusEnum.ENABLE.getCode());
 		//保存用户数据
@@ -85,7 +86,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
 		//若存在，验证密码是否正确
 		boolean matches = encoder.matches(param.getPassword(), entity.getPassword());
-		if(!matches){
+		if (!matches) {
 			throw new RRException("密码错误");
 		}
 
@@ -96,13 +97,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 	public MemberEntity oauthLogin(MemberEntity member) {
 		//获取社交用户的id，如果系统里没有则新建，否则更新
 		MemberEntity memberEntity = this.getOne(Wrappers.lambdaQuery(MemberEntity.class).eq(MemberEntity::getSocialUid, member.getSocialUid()));
-		if(memberEntity != null){
+		if (memberEntity != null) {
 			//已存在用户，更新
 			memberEntity.setAccessToken(member.getAccessToken());
 			memberEntity.setExpires_in(member.getExpires_in());
 			this.updateById(memberEntity);
 			return memberEntity;
-		}else {
+		} else {
 			//用户不存在，保存
 			member.setId(sequence.nextId());
 			member.setLevelId(memberLevelService.getDefaultLevel().getId());

@@ -9,7 +9,7 @@ public class MyWebConfig implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		//将对应的路由和页面的名字写进去即可，多个页面就注册多条
-		registry.addViewController("/login.html").setViewName("login");
+//		registry.addViewController("/login.html").setViewName("login");
 		registry.addViewController("/register.html").setViewName("register");
 	}
 }

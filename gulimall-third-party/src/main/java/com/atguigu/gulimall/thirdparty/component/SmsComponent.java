@@ -20,7 +20,7 @@ public class SmsComponent {
 	public void sendSmsCode(String phone, String code) {
 		String method = "GET";
 		Map<String, String> headers = new HashMap<String, String>();
-		//最后在header中的格式(中间是英文空格)为Authorization:APPCODE 83359fd73fe94948385f570e3c139105
+		//最后在header中的格式(中间是英文空格)为Authorization:APPCODE yourcode
 		headers.put("Authorization", "APPCODE " + appcode);
 		Map<String, String> querys = new HashMap<String, String>();
 		querys.put("mobile", phone);

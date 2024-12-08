@@ -3,13 +3,14 @@ package com.atguigu.gulimall.authserver.web;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.nacos.api.naming.pojo.healthcheck.impl.Http;
 import com.atguigu.common.utils.HttpUtils;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.authserver.config.GiteeConfiguration;
 import com.atguigu.gulimall.authserver.feign.MemberFeignService;
 import com.atguigu.gulimall.authserver.feign.ThirdPartyFeignService;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
-import com.atguigu.gulimall.authserver.vo.SocialUserParam;
+import com.atguigu.common.vo.SocialUserParam;
 import com.atguigu.gulimall.authserver.vo.UserLoginParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -131,11 +132,24 @@ public class AuthController {
 		return "redirect:http://auth.gulimall.com:9099/login.html";
 	}
 
+	@GetMapping("/login.html")
+	public String loginPage(HttpSession session) {
+		//访问登录页面，需要根据是否有session数据判断
+		if (session.getAttribute("loginUser") == null) {
+			//未登录
+			return "login";
+		}
+		return "redirect:http://gulimall.com:9099";
+	}
+
 	@PostMapping("/login")
-	public String login(UserLoginParam param, RedirectAttributes attributes) {
+	public String login(UserLoginParam param, RedirectAttributes attributes, HttpSession session) {
 		//调用远程登录服务
 		R login = memberFeignService.login(param);
 		if (login.getCode() == 0) {
+			SocialUserParam data = login.getData(new TypeReference<SocialUserParam>() {
+			});
+			session.setAttribute("loginUser", data);
 			return "redirect:http://gulimall.com:9099";
 		}
 		Map<String, String> errors = new HashMap<>();
@@ -195,5 +209,14 @@ public class AuthController {
 		}
 		//失败则重定向到登录页面
 		return "redirect:http://auth.gulimall.com:9099/login.html";
+	}
+
+	@GetMapping("/logout.html")
+	public String logout(HttpSession session){
+		//清空session中的用户
+		session.removeAttribute("loginUser");
+		//将session注销
+		session.invalidate();
+		return "login";
 	}
 }
