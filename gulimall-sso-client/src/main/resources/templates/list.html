@@ -4,7 +4,7 @@
     <title>client1</title>
 </head>
 <body>
-<h1>欢迎: []</h1>
+<h1>欢迎: [[${session.loginUser}]]</h1>
 <ul>
     <li th:each="emp:${emps}">[[${emp}]]</li>
 </ul>
