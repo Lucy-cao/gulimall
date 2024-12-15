@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class SocialUserParam implements Serializable {
+public class MemberRespVo implements Serializable {
 	/**
 	 * id
 	 */

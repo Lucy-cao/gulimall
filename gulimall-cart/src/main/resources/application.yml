@@ -9,3 +9,11 @@ spring:
       config:
         import-check:
           enabled: false
+  thymeleaf:
+    cache: false
+  redis:
+      host: 120.26.84.61
+      password: abc,,,123
+  session:
+    redis:
+      namespace: spring:session

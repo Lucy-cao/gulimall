@@ -3,14 +3,14 @@ package com.atguigu.gulimall.authserver.web;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.nacos.api.naming.pojo.healthcheck.impl.Http;
+import com.atguigu.common.constant.AuthConstant;
 import com.atguigu.common.utils.HttpUtils;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.authserver.config.GiteeConfiguration;
 import com.atguigu.gulimall.authserver.feign.MemberFeignService;
 import com.atguigu.gulimall.authserver.feign.ThirdPartyFeignService;
 import com.atguigu.gulimall.authserver.vo.RegisterParam;
-import com.atguigu.common.vo.SocialUserParam;
+import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.authserver.vo.UserLoginParam;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.atguigu.gulimall.authserver.constant.AuthConstant.SMS_CODE_CACHE_PREFIX;
+import static com.atguigu.common.constant.AuthConstant.SMS_CODE_CACHE_PREFIX;
 
 @Controller
 public class AuthController {
@@ -135,7 +135,7 @@ public class AuthController {
 	@GetMapping("/login.html")
 	public String loginPage(HttpSession session) {
 		//访问登录页面，需要根据是否有session数据判断
-		if (session.getAttribute("loginUser") == null) {
+		if (session.getAttribute(AuthConstant.LOGIN_USER) == null) {
 			//未登录
 			return "login";
 		}
@@ -147,9 +147,9 @@ public class AuthController {
 		//调用远程登录服务
 		R login = memberFeignService.login(param);
 		if (login.getCode() == 0) {
-			SocialUserParam data = login.getData(new TypeReference<SocialUserParam>() {
+			MemberRespVo data = login.getData(new TypeReference<MemberRespVo>() {
 			});
-			session.setAttribute("loginUser", data);
+			session.setAttribute(AuthConstant.LOGIN_USER, data);
 			return "redirect:http://gulimall.com:9099";
 		}
 		Map<String, String> errors = new HashMap<>();
@@ -189,7 +189,7 @@ public class AuthController {
 				JSONObject userJsonObject = JSON.parseObject(userJson);
 
 				// 调用远程用户服务，添加用户，与第三方应用建立绑定关系
-				SocialUserParam socialUserParam = new SocialUserParam();
+				MemberRespVo socialUserParam = new MemberRespVo();
 				socialUserParam.setUsername(userJsonObject.getString("name"));
 				socialUserParam.setHeader(userJsonObject.getString("avatar_url"));
 				socialUserParam.setNickname(userJsonObject.getString("name"));
@@ -198,10 +198,10 @@ public class AuthController {
 				socialUserParam.setExpires_in(expiresIn);
 				R feignResponse = memberFeignService.oauthLogin(socialUserParam);
 				if (feignResponse.getCode() == 0) {
-					SocialUserParam user = feignResponse.getData(new TypeReference<SocialUserParam>() {
+					MemberRespVo user = feignResponse.getData(new TypeReference<MemberRespVo>() {
 					});
 					System.out.println("成功登录：" + user);
-					session.setAttribute("loginUser", user);
+					session.setAttribute(AuthConstant.LOGIN_USER, user);
 					// 成功则返回首页
 					return "redirect:http://gulimall.com:9099";
 				}
@@ -214,7 +214,7 @@ public class AuthController {
 	@GetMapping("/logout.html")
 	public String logout(HttpSession session){
 		//清空session中的用户
-		session.removeAttribute("loginUser");
+		session.removeAttribute(AuthConstant.LOGIN_USER);
 		//将session注销
 		session.invalidate();
 		return "login";
