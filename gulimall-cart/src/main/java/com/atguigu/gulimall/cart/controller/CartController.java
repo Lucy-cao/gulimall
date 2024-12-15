@@ -22,4 +22,9 @@ public class CartController {
 		System.out.println("userInfoTo = " + userInfoTo);
 		return "cartList";
 	}
+
+	@GetMapping("/addToCart")
+	public String successPage(){
+		return "success";
+	}
 }
