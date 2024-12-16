@@ -39,11 +39,11 @@ public class CartServiceImpl implements CartService {
 		Object skuRes = cartOps.get(skuId.toString());
 
 		CartItem cartItem = null;
-		if(skuRes != null){
+		if (skuRes != null) {
 			//如果redis里面已经有商品，则取出来商品数量加上新添加的数量
 			cartItem = JSON.parseObject(skuRes.toString(), CartItem.class);
 			cartItem.setCount(cartItem.getCount() + num);
-		}else{
+		} else {
 			//如果redis里面没有此商品，获取加入购物车商品的详情信息
 			cartItem = new CartItem();
 			//使用异步线程同时获取商品的基础信息和销售属性信息
@@ -69,6 +69,14 @@ public class CartServiceImpl implements CartService {
 		}
 		//将商品详情放入至redis
 		cartOps.put(skuId.toString(), JSON.toJSONString(cartItem));
+		return cartItem;
+	}
+
+	@Override
+	public CartItem getCartItem(Long skuId) {
+		BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+		Object skuRes = cartOps.get(skuId.toString());
+		CartItem cartItem = (skuRes != null) ? JSON.parseObject(skuRes.toString(), CartItem.class) : null;
 		return cartItem;
 	}
 
