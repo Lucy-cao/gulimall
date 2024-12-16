@@ -35,6 +35,13 @@ public class R extends HashMap<String, Object> {
         return result;
     }
 
+    public <T> T getData(String filedName, TypeReference<T> typeReference) {
+        Object data = get(filedName);
+        String jsonString = JSON.toJSONString(data);
+        T result = JSON.parseObject(jsonString, typeReference);
+        return result;
+    }
+
     public void setData(Object data) {
         put("data", data);
     }

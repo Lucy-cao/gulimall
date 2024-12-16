@@ -17,3 +17,9 @@ spring:
   session:
     redis:
       namespace: spring:session
+# 线程池的参数
+gulimall:
+  thread:
+    core-size: 50
+    max-size: 200
+    keep-alive-time: 10
