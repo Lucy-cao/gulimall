@@ -6,6 +6,7 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.cart.feign.ProductFeignService;
 import com.atguigu.gulimall.cart.interceptor.CartLoginInterceptor;
 import com.atguigu.gulimall.cart.service.CartService;
+import com.atguigu.gulimall.cart.vo.Cart;
 import com.atguigu.gulimall.cart.vo.CartItem;
 import com.atguigu.gulimall.cart.vo.SkuInfoVo;
 import com.atguigu.gulimall.cart.vo.UserInfoTo;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -80,6 +82,40 @@ public class CartServiceImpl implements CartService {
 		return cartItem;
 	}
 
+	@Override
+	public Cart getCart() throws ExecutionException, InterruptedException {
+		Cart cart = new Cart();
+		UserInfoTo userInfoTo = CartLoginInterceptor.threadLocal.get();
+		String tempKey = CART_PREFIX + userInfoTo.getUserKey();
+		if (userInfoTo.getUserId() != null) {
+			//用户已登录
+			//判断是否有临时用户的购物车，如果有需要合并到当前登录用户的购物车
+			List<CartItem> tempItems = getCartItemsByKey(tempKey);
+			if (tempItems != null && tempItems.size() > 0) {
+				for (CartItem tempItem : tempItems) {
+					addToCart(tempItem.getSkuId(), tempItem.getCount());
+				}
+				//删除临时用户的购物车
+				clearCart(tempKey);
+			}
+			//返回当前登录用户的购物车
+			String userKey = CART_PREFIX + userInfoTo.getUserId();
+			List<CartItem> items = getCartItemsByKey(userKey);
+			cart.setItems(items);
+		} else {
+			//用户未登录
+			List<CartItem> items = getCartItemsByKey(tempKey);
+			cart.setItems(items);
+		}
+
+		return cart;
+	}
+
+	@Override
+	public void clearCart(String cartKey) {
+		redisTemplate.delete(cartKey);
+	}
+
 	private BoundHashOperations<String, Object, Object> getCartOps() {
 		String redisKey = "";
 		UserInfoTo userInfoTo = CartLoginInterceptor.threadLocal.get();
@@ -92,5 +128,16 @@ public class CartServiceImpl implements CartService {
 		}
 		//获取对当前正式用户或临时用户数据的哈希操作
 		return redisTemplate.boundHashOps(redisKey);
+	}
+
+	private List<CartItem> getCartItemsByKey(String cartKey) {
+		List<Object> values = redisTemplate.boundHashOps(cartKey).values();
+		if (values != null && values.size() > 0) {
+			List<CartItem> collect = values.stream().map(obj -> {
+				return JSON.parseObject(obj.toString(), CartItem.class);
+			}).collect(Collectors.toList());
+			return collect;
+		}
+		return null;
 	}
 }

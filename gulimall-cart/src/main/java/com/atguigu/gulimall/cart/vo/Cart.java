@@ -12,7 +12,7 @@ public class Cart {
 	private Integer CartTypeNum;//商品种类数量
 	private Integer CartNum;//商品总数量
 	private BigDecimal totalAmount;//商品总金额
-	private BigDecimal totalReduceAmount;//优惠总金额
+	private BigDecimal totalReduceAmount = new BigDecimal(0);//优惠总金额
 
 	public List<CartItem> getItems() {
 		return items;
@@ -32,8 +32,10 @@ public class Cart {
 
 	public BigDecimal getTotalAmount() {
 		BigDecimal totalAmount = new BigDecimal(0);
-		for (CartItem item : items) {
-			totalAmount = totalAmount.add(item.getTotalPrice());
+		if (items != null && items.size() > 0) {
+			for (CartItem item : items) {
+				totalAmount = totalAmount.add(item.getTotalPrice());
+			}
 		}
 		return totalAmount;
 	}

@@ -29,10 +29,10 @@ public class CartController {
 	 * 没登录：使用cookie里的user-key标识身份，查看临时购物车数据
 	 */
 	@GetMapping("/cart.html")
-	public String cartListPage() {
-		//根据是否登录，如果登录，返回正式用户的购物车数据；如果未登录，返回临时用户的购物车数据
-		UserInfoTo userInfoTo = CartLoginInterceptor.threadLocal.get();
-		System.out.println("userInfoTo = " + userInfoTo);
+	public String cartListPage(Model model) throws ExecutionException, InterruptedException {
+		//获取正式用户或临时用户的购物车
+		Cart cart = cartService.getCart();
+		model.addAttribute("cart", cart);
 		return "cartList";
 	}
 
