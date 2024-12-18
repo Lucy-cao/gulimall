@@ -94,14 +94,16 @@
                     </div>
                     <div>
                         <ol>
-                            <li><input type="checkbox" class="check" th:checked="${item.check}"></li>
+                            <li><input type="checkbox" th:attr="skuId=${item.skuId}" class="checkItem"
+                                       th:checked="${item.check}"></li>
                             <li>
                                 <dt><img th:src="${item.image}" alt=""></dt>
                                 <dd style="width: 300px">
                                     <p>
                                         <span th:text="${item.title}">TCL 55A950C 55英寸32核</span>
                                         <br/>
-                                        <span th:each="attr:${item.attrs}" th:text="${attr}+' '">尺码: 55时 超薄曲面 人工智能</span>
+                                        <span th:each="attr:${item.attrs}"
+                                              th:text="${attr}+' '">尺码: 55时 超薄曲面 人工智能</span>
                                     </p>
                                 </dd>
                             </li>
@@ -109,16 +111,18 @@
                                 <p class="dj" th:text="'￥'+${#numbers.formatDecimal(item.price,1,2)}">￥4599.00</p>
                             </li>
                             <li>
-                                <p style="width: 80px;height: 18px;">
-                                    <span>-</span>
-                                    <span th:text="${item.count}">5</span>
-                                    <span>+</span>
+                                <p style="width: 80px;height: 18px;" th:attr="skuId=${item.skuId}">
+                                    <span class="countChangeBtn">-</span>
+                                    <span th:text="${item.count}" class="countValue">5</span>
+                                    <span class="countChangeBtn">+</span>
                                 </p>
 
                             </li>
-                            <li style="font-weight:bold"><p class="zj" th:text="'￥'+${#numbers.formatDecimal(item.totalPrice,1,2)}">￥22995.00</p></li>
+                            <li style="font-weight:bold"><p class="zj"
+                                                            th:text="'￥'+${#numbers.formatDecimal(item.totalPrice,1,2)}">
+                                ￥22995.00</p></li>
                             <li>
-                                <p>删除</p>
+                                <p class="deleteItemBtn" th:attr="skuId=${item.skuId}">删除</p>
 
                             </li>
                         </ol>
@@ -146,7 +150,8 @@
             </div>
             <div>
                 <ol>
-                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥[[${#numbers.formatDecimal(cart.totalAmount,1,2)}]]</span></li>
+                    <li>总价:<span style="color:#e64346;font-weight:bold;font-size:16px;" class="fnt">￥[[${#numbers.formatDecimal(cart.totalAmount,1,2)}]]</span>
+                    </li>
                     <li>优惠：￥[[${#numbers.formatDecimal(cart.totalReduceAmount,1,2)}]]</li>
                 </ol>
             </div>
@@ -171,7 +176,7 @@
         </dl>
     </div>
     <div>
-        <button type="button">删除</button>
+        <button type="button" onclick="deleteItem()">删除</button>
 
     </div>
 </div>
@@ -765,5 +770,30 @@
     }).mouseout(function () {
         $(this).children("p").children("img").attr("src", "/static/cart/img/one_mian_gwc1.png")
     })
+
+    $(".checkItem").click(function () {
+        var skuId = $(this).attr("skuId");
+        var checked = $(this).prop("checked");
+        location.href = "http://cart.gulimall.com:9099/checkItem?skuId=" + skuId + "&check=" + (checked ? 1 : 0);
+    });
+
+    $(".countChangeBtn").click(function (){
+        var skuId = $(this).parent().attr("skuId");
+        var count = $(this).parent().find(".countValue").text();
+        location.href = "http://cart.gulimall.com:9099/changeItemCount?skuId=" + skuId + "&count=" + count;
+    });
+
+    //每一个商品删除操作
+    //创建全局变量保存当前删除的是哪个商品
+    var skuId = 0;
+    function deleteItem(){
+        console.log("deleteItem执行的删除操作："+skuId);
+        location.href = "http://cart.gulimall.com:9099/deleteItem?skuId=" + skuId;
+    };
+
+    $(".deleteItemBtn").click(function (){
+        skuId = $(this).attr("skuId");
+    });
+
 </script>
 </html>

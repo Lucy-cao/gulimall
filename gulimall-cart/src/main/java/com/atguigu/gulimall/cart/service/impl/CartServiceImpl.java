@@ -116,6 +116,30 @@ public class CartServiceImpl implements CartService {
 		redisTemplate.delete(cartKey);
 	}
 
+	@Override
+	public void checkItem(Long skuId, Integer check) {
+		BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+		Object skuRes = cartOps.get(skuId.toString());
+		CartItem cartItem = JSON.parseObject(skuRes.toString(), CartItem.class);
+		cartItem.setCheck(check == 1 ? true : false);
+		cartOps.put(skuId.toString(), JSON.toJSONString(cartItem));
+	}
+
+	@Override
+	public void changeItemCount(Long skuId, Integer count) {
+		BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+		Object skuRes = cartOps.get(skuId.toString());
+		CartItem cartItem = JSON.parseObject(skuRes.toString(), CartItem.class);
+		cartItem.setCount(count);
+		cartOps.put(skuId.toString(), JSON.toJSONString(cartItem));
+	}
+
+	@Override
+	public void deleteItem(Long skuId) {
+		BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+		cartOps.delete(skuId.toString());
+	}
+
 	private BoundHashOperations<String, Object, Object> getCartOps() {
 		String redisKey = "";
 		UserInfoTo userInfoTo = CartLoginInterceptor.threadLocal.get();
