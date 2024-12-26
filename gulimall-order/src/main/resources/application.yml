@@ -8,8 +8,15 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+      config:
+        import-check:
+          enabled: false
   application:
     name: "gulimall-order"
+  rabbitmq:
+    host: 120.26.84.61
+    port: 5672
+    virtual-host: /
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:
