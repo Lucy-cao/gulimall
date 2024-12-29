@@ -50,6 +50,10 @@ spring:
           uri: lb://gulimall-cart
           predicates:
             - Host=cart.gulimall.com
+        - id: web_order_route
+          uri: lb://gulimall-order
+          predicates:
+            - Host=order.gulimall.com
 
         # 跳转到renren-fast相关的接口服务中
         - id: admin_route

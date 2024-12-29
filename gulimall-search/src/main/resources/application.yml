@@ -18,5 +18,5 @@ spring:
     password: abc,,,123
 
 es:
-  host: 120.26.84.61
+  host: localhost
   port: 9200

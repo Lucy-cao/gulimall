@@ -30,11 +30,11 @@ public class RabbitServiceImpl {
 		//channel内按顺序自增的一个标识
 		long deliveryTag = message.getMessageProperties().getDeliveryTag();
 		System.out.println("deliveryTag = " + deliveryTag);
-		if(deliveryTag%2==0){
+		if (deliveryTag % 2 == 0) {
 			//进行手动ack，非批量模式。确认签收获取
 			channel.basicAck(deliveryTag, false);
 			System.out.println("货物已被签收 deliveryTag = " + deliveryTag);
-		}else{
+		} else {
 			//手动拒签
 			//basicNack(long deliveryTag, boolean multiple, boolean requeue)
 			//requeue是否重新入队，如果设为true则重新入队，deliveryTag会变化为最新的顺序；如果设为false，直接丢弃
