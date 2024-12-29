@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * RabbitMQ引入
@@ -17,6 +18,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  * 3、添加配置参数：配置参数都在RabbitProperties中，在application.yml中以spring.rabbitmq开头
  * 4、启用RabbitMQ服务 @EnableRabbit
  */
+@EnableRedisHttpSession
 @MapperScan("com/atguigu/gulimall/order/dao")
 @SpringBootApplication(exclude = {OssContextAutoConfiguration.class})
 @EnableDiscoveryClient

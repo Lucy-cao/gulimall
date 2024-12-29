@@ -35,7 +35,7 @@
                     <a href="http://auth.gulimall.com:9099/logout.html" class="li_2" th:if="${session.loginUser!=null}">退出登录</a>
                 </li>
                 <li class="spacer"></li>
-                <li><a href="">我的订单</a></li>
+                <li><a href="http://order.gulimall.com:9099/list.html" th:if="${session.loginUser!=null}">我的订单</a></li>
                 <li class="spacer"></li>
 
             </ul>

@@ -22,6 +22,13 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual # 手动ack消息
+  session:
+    redis:
+      namespace: spring:session
+    store-type: redis
+  redis:
+    host: 120.26.84.61
+    password: abc,,,123
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
   global-config:
@@ -29,3 +36,10 @@ mybatis-plus:
       id-type: auto
 server:
   port: 9000
+
+# 线程池的参数
+gulimall:
+  thread:
+    core-size: 50
+    max-size: 200
+    keep-alive-time: 10
