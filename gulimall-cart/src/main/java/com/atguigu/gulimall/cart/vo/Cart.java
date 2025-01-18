@@ -34,7 +34,10 @@ public class Cart {
 		BigDecimal totalAmount = new BigDecimal(0);
 		if (items != null && items.size() > 0) {
 			for (CartItem item : items) {
-				totalAmount = totalAmount.add(item.getTotalPrice());
+				//统计被选中的商品总金额
+				if(item.getCheck()){
+					totalAmount = totalAmount.add(item.getTotalPrice());
+				}
 			}
 		}
 		return totalAmount;

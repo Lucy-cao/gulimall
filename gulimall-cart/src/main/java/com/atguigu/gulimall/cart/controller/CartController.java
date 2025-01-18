@@ -13,12 +13,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.jws.WebParam;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Controller
 public class CartController {
 	@Autowired
 	CartService cartService;
+
+	@GetMapping("/getUserCartItems")
+	public List<CartItem> getUserCartItems(){
+		List<CartItem> items = cartService.getUserCartItems();
+		return items;
+	}
 
 	/**
 	 * 查看购物车列表

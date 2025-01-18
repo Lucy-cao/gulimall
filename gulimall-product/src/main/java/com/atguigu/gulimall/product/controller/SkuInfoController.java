@@ -1,8 +1,13 @@
 package com.atguigu.gulimall.product.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.atguigu.gulimall.product.dao.SkuInfoDao;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,8 @@ import com.atguigu.common.utils.R;
 public class SkuInfoController {
     @Autowired
     private SkuInfoService skuInfoService;
+    @Autowired
+    SkuInfoDao skuInfoDao;
 
     /**
      * 列表
@@ -84,6 +91,16 @@ public class SkuInfoController {
 		skuInfoService.removeByIds(Arrays.asList(skuIds));
 
         return R.ok();
+    }
+
+    @GetMapping("/getSkuInfoByIds")
+    public R getSkuInfoByIds(@RequestBody List<Long> skuIds){
+        List<SkuInfoEntity> entities = skuInfoDao.selectBatchIds(skuIds);
+        Map<Long, BigDecimal> result = new HashMap<>();
+        entities.forEach(entity->{
+            result.put(entity.getSkuId(), entity.getPrice());
+        });
+        return R.ok().put("data", result);
     }
 
 }

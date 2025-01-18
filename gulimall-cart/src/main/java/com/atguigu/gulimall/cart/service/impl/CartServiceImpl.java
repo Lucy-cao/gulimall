@@ -15,7 +15,9 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -138,6 +140,32 @@ public class CartServiceImpl implements CartService {
 	public void deleteItem(Long skuId) {
 		BoundHashOperations<String, Object, Object> cartOps = getCartOps();
 		cartOps.delete(skuId.toString());
+	}
+
+	@Override
+	public List<CartItem> getUserCartItems() {
+		//获取当前用户id
+		UserInfoTo userInfoTo = CartLoginInterceptor.threadLocal.get();
+		if (userInfoTo.getUserId() != null) {
+			String redisKey = CART_PREFIX + userInfoTo.getUserId();
+			List<CartItem> items = getCartItemsByKey(redisKey);
+			if (items == null) {
+				return null;
+			}
+			//获取所有被选中的购物项
+			List<CartItem> checkedSkus = items.stream().filter(CartItem::getCheck)
+					.collect(Collectors.toList());
+			List<Long> skuIds = checkedSkus.stream().map(CartItem::getSkuId).collect(Collectors.toList());
+			R response = productFeignService.getSkuInfoByIds(skuIds);
+			Map<Long, BigDecimal> skuInfoPrice = response.getData(new TypeReference<Map<Long, BigDecimal>>() {
+			});
+			List<CartItem> collect = checkedSkus.stream().map(item -> {
+				item.setPrice(skuInfoPrice.get(item.getSkuId()));
+				return item;
+			}).collect(Collectors.toList());
+			return collect;
+		}
+		return null;
 	}
 
 	private BoundHashOperations<String, Object, Object> getCartOps() {

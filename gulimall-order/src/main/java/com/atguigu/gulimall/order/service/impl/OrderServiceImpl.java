@@ -1,6 +1,18 @@
 package com.atguigu.gulimall.order.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.utils.R;
+import com.atguigu.common.vo.MemberRespVo;
+import com.atguigu.gulimall.order.feign.CartFeignService;
+import com.atguigu.gulimall.order.feign.MemberFeignService;
+import com.atguigu.gulimall.order.interceptor.LoginInterceptor;
+import com.atguigu.gulimall.order.vo.MemberAddressVo;
+import com.atguigu.gulimall.order.vo.OrderConfirmVo;
+import com.atguigu.gulimall.order.vo.OrderItemVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,6 +27,10 @@ import com.atguigu.gulimall.order.service.OrderService;
 
 @Service("orderService")
 public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> implements OrderService {
+	@Autowired
+	MemberFeignService memberFeignService;
+	@Autowired
+	CartFeignService cartFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -25,5 +41,28 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         return new PageUtils(page);
     }
+
+	@Override
+	public OrderConfirmVo getConfirmData() {
+		OrderConfirmVo orderConfirmVo = new OrderConfirmVo();
+		MemberRespVo memberRespVo = LoginInterceptor.userLogin.get();
+		//1、获取收货人信息
+		R response = memberFeignService.getMemberAddress(memberRespVo.getId());
+		List<MemberAddressVo> address = response.getData(new TypeReference<List<MemberAddressVo>>() {
+		});
+		orderConfirmVo.setAddress(address);
+
+		//2、获取购物车的商品信息
+		List<OrderItemVo> items = cartFeignService.getUserCartItems();
+		orderConfirmVo.setItems(items);
+
+		//3、获取优惠券
+		Integer integration = memberRespVo.getIntegration();
+		orderConfirmVo.setIntegration(integration);
+
+		//计算总金额和应付金额
+
+		return orderConfirmVo;
+	}
 
 }
