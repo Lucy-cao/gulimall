@@ -93,7 +93,7 @@ public class SkuInfoController {
         return R.ok();
     }
 
-    @GetMapping("/getSkuInfoByIds")
+    @PostMapping("/getSkuInfoByIds")
     public R getSkuInfoByIds(@RequestBody List<Long> skuIds){
         List<SkuInfoEntity> entities = skuInfoDao.selectBatchIds(skuIds);
         Map<Long, BigDecimal> result = new HashMap<>();
