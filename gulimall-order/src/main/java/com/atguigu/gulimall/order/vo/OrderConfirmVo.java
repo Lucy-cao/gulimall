@@ -27,13 +27,24 @@ public class OrderConfirmVo {
 	@Setter
 	Integer integration;
 
-	// 商品总金额
-//	BigDecimal total;
+	public Integer getTotalCount() {
+		Integer i = 0;
+		if (items != null) {
+			for (OrderItemVo item : items) {
+				i += item.getCount();
+			}
+		}
+		return i;
+	}
 
-	public BigDecimal getTotal() {
+
+	// 商品总金额
+//	BigDecimal totalPrice;
+
+	public BigDecimal getTotalPrice() {
 		BigDecimal sum = new BigDecimal(0);
-		for (OrderItemVo item : items) {
-			if (item != null) {
+		if (items != null) {
+			for (OrderItemVo item : items) {
 				BigDecimal totalPrice = item.getPrice().multiply(new BigDecimal(item.getCount()));
 				sum = sum.add(totalPrice);
 			}
@@ -45,6 +56,6 @@ public class OrderConfirmVo {
 //	BigDecimal payPrice;
 
 	public BigDecimal getPayPrice() {
-		return getTotal();
+		return getTotalPrice();
 	}
 }
