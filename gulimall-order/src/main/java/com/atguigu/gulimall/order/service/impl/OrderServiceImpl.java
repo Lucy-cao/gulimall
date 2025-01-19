@@ -60,7 +60,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 		Integer integration = memberRespVo.getIntegration();
 		orderConfirmVo.setIntegration(integration);
 
-		//计算总金额和应付金额
+		//4、其他数据自动计算
 
 		return orderConfirmVo;
 	}

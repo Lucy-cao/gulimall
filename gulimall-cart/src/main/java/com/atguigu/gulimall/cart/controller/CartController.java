@@ -22,7 +22,7 @@ public class CartController {
 	@Autowired
 	CartService cartService;
 
-	@ResponseBody
+	@ResponseBody //需要直接返回json数据，所以需要注解@ResponseBody，否则找不到对应页面会报错
 	@GetMapping("/getUserCartItems")
 	public List<CartItem> getUserCartItems(){
 		List<CartItem> items = cartService.getUserCartItems();
