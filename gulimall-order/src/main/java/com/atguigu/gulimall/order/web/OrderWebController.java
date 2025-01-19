@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpSession;
+import java.util.concurrent.ExecutionException;
 
 @Controller
 public class OrderWebController {
@@ -27,7 +28,7 @@ public class OrderWebController {
 	 * 跳转结算页面
 	 */
 	@GetMapping("/toTrade")
-	public String toTrade(Model model) {
+	public String toTrade(Model model) throws ExecutionException, InterruptedException {
 		//获取结算页面的数据
 		OrderConfirmVo confirmVo = orderService.getConfirmData();
 		model.addAttribute("orderConfirmData", confirmVo);
